@@ -95,6 +95,20 @@
   </div>
 
   <div class="dashboard-main-body" id="content-section">
+    <!-- Flash Messages -->
+    <div id="flash-messages" class="mb-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
     <!-- Welcome Dashboard Section -->
     <div id="welcome-dashboard" class="section">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
@@ -214,7 +228,7 @@
               <div>
                 <label class="form-label fw-bold text-neutral-900" for="aadharFile">Aadhar Upload: </label>
                 <input type="file" class="form-control border border-neutral-200 radius-8" id="aadharFile" name="aadharFile" accept=".pdf" required>
-                <small class="form-text text-muted">Upload Aadhar (PDF only)</small>
+                <small class="form-text text-muted">Upload Aadhar (PDF only, max 5MB)</small>
                 <div class="invalid-feedback">Please upload a valid PDF file.</div>
               </div>
               <div>
@@ -224,7 +238,7 @@
               <div>
                 <label class="form-label fw-bold text-neutral-900" for="panFile">PAN Upload: </label>
                 <input type="file" class="form-control border border-neutral-200 radius-8" id="panFile" name="panFile" accept=".pdf" required>
-                <small class="form-text text-muted">Upload PAN (PDF only)</small>
+                <small class="form-text text-muted">Upload PAN (PDF only, max 5MB)</small>
                 <div class="invalid-feedback">Please upload a valid PDF file.</div>
               </div>
               <div class="d-flex gap-3">
@@ -260,6 +274,41 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('welcome-dashboard').style.display = 'block';
 
+    // Client-side validation for Aadhar and PAN
+    document.getElementById('aadharNumber').addEventListener('input', (e) => {
+      const aadharRegex = /^\d{12}$/;
+      if (!aadharRegex.test(e.target.value)) {
+        e.target.setCustomValidity('Aadhar number must be a 12-digit number.');
+      } else {
+        e.target.setCustomValidity('');
+      }
+    });
+
+    document.getElementById('panNumber').addEventListener('input', (e) => {
+      const panRegex = /^[A-Z]{5}\d{4}[A-Z]{1}$/;
+      if (!panRegex.test(e.target.value)) {
+        e.target.setCustomValidity('PAN number must be in the format ABCDE1234F.');
+      } else {
+        e.target.setCustomValidity('');
+      }
+    });
+
+    // Client-side file size validation
+    document.getElementById('aadharFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.size > 5 * 1024 * 1024) {
+        alert('Aadhar file size must be less than 5MB.');
+        e.target.value = '';
+      }
+    });
+    document.getElementById('panFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.size > 5 * 1024 * 1024) {
+        alert('PAN file size must be less than 5MB.');
+        e.target.value = '';
+      }
+    });
+
     // Handle sidebar navigation
     document.querySelectorAll('.sidebar-submenu a').forEach(link => {
       link.addEventListener('click', (e) => {
@@ -285,17 +334,28 @@
         method: 'POST',
         body: formData
       })
-      .then(response => response.json())
+      .then(response => {
+        if (response.status === 401) {
+          alert('Please sign in to continue.');
+          window.location.href = '/sign-in';
+          return;
+        }
+        return response.json();
+      })
       .then(data => {
-        if (data.error) {
+        if (data && data.error) {
           alert(data.error);
-        } else {
-          alert(data.message);
+        } else if (data) {
           loanModal.hide();
           loanForm.reset();
-          if (document.getElementById('view-loan').style.display === 'block') {
-            fetchLoans();
-          }
+          // Show success message in the UI
+          const successMessage = document.createElement('div');
+          successMessage.className = 'alert alert-success alert-dismissible fade show';
+          successMessage.innerHTML = `
+            Loan application submitted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.getElementById('apply-loan').prepend(successMessage);
         }
       })
       .catch(error => {
@@ -307,20 +367,29 @@
     // Fetch and Render Loans
     function fetchLoans() {
       fetch('/get-loans')
-        .then(response => response.json())
+        .then(response => {
+          if (response.status === 401) {
+            alert('Please sign in to continue.');
+            window.location.href = '/sign-in';
+            return;
+          }
+          return response.json();
+        })
         .then(data => {
-          const loanTableBody = document.getElementById('loanTableBody');
-          loanTableBody.innerHTML = '';
-          data.loans.forEach(loan => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${loan.loan_id}</td>
-              <td>$${parseFloat(loan.loan_amount).toFixed(2)}</td>
-              <td>${loan.loan_purpose}</td>
-              <td><span class="badge bg-warning">Pending</span></td>
-            `;
-            loanTableBody.appendChild(row);
-          });
+          if (data) {
+            const loanTableBody = document.getElementById('loanTableBody');
+            loanTableBody.innerHTML = '';
+            data.loans.forEach(loan => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${loan.loan_id}</td>
+                <td>$${parseFloat(loan.loan_amount).toFixed(2)}</td>
+                <td>${loan.loan_purpose}</td>
+                <td><span class="badge bg-warning">${loan.status}</span></td>
+              `;
+              loanTableBody.appendChild(row);
+            });
+          }
         })
         .catch(error => {
           console.error('Error fetching loans:', error);
