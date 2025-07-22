@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for, session, f
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import re
 import logging
@@ -34,6 +34,7 @@ logger.info("Supabase client initialized successfully")
 
 app = Flask(__name__, static_folder='assets', template_folder='templates')
 app.secret_key = os.getenv("FLASK_SECRET_KEY", str(uuid.uuid4()))
+app.permanent_session_lifetime = timedelta(days=1)
 
 # Validation functions
 def is_valid_email(email):
@@ -48,13 +49,14 @@ def is_valid_password(password):
 
 def is_valid_sign_up_as(sign_up_as):
     return sign_up_as in ['merchant', 'loan_borrower', 'NBFC Admin']
+
 def is_valid_aadhar_number(aadhar_number):
-    # Must be exactly 12 digits
-    return bool(re.fullmatch(r'\d{12}', aadhar_number))
+    regex = r'^\d{12}$'
+    return re.match(regex, aadhar_number)
 
 def is_valid_pan_number(pan_number):
-    # Must be in the format: 5 letters, 4 digits, 1 letter (e.g., ABCDE1234F)
-    return bool(re.fullmatch(r'[A-Z]{5}[0-9]{4}[A-Z]', pan_number))
+    regex = r'^[A-Z]{5}\d{4}[A-Z]{1}$'
+    return re.match(regex, pan_number)
 
 @app.route('/')
 def home():
@@ -109,9 +111,11 @@ def signup():
 
             response = supabase.table('users').insert(user_data).execute()
             if response.data:
+                session.permanent = True
                 session['user_id'] = user_data['id']
                 session['username'] = username
                 session['sign_in_as'] = sign_up_as
+                logger.info(f"User signed up: {username}, role: {sign_up_as}")
                 flash("Sign-up successful!", "info")
                 return redirect(url_for('dashboard'))
             else:
@@ -150,9 +154,11 @@ def signin():
 
             user_data = user.data[0]
             if check_password_hash(user_data['password'], password) and user_data['sign_up_as'] == sign_in_as:
+                session.permanent = True
                 session['user_id'] = user_data['id']
                 session['username'] = user_data['username']
                 session['sign_in_as'] = sign_in_as
+                logger.info(f"User signed in: {user_data['username']}, role: {sign_in_as}")
                 flash("Signed in successfully!", "info")
                 return redirect(url_for('dashboard'))
             else:
@@ -166,6 +172,7 @@ def signin():
 
 @app.route('/dashboard')
 def dashboard():
+    logger.info(f"Accessing dashboard, session: {session.get('user_id')}, {session.get('sign_in_as')}")
     if 'user_id' not in session:
         flash("Please sign in to continue.", "error")
         return redirect(url_for('signin'))
@@ -175,7 +182,6 @@ def dashboard():
 
     if role == 'merchant':
         try:
-            # Fetch products for the logged-in user
             products = supabase.table('products').select('*').eq('user_id', session['user_id']).execute().data
             return render_template('Merchant.html', username=username, role=role, products=products or [])
         except Exception as e:
@@ -184,11 +190,12 @@ def dashboard():
             return render_template('Merchant.html', username=username, role=role, products=[])
     elif role == 'loan_borrower':
         return render_template('loan-browser.html', username=username, role=role)
-    elif role == 'admin':
+    elif role == 'NBFC Admin':
         return render_template('admin.html', username=username, role=role)
     else:
         flash("Invalid role. Please sign in again.", "error")
         return redirect(url_for('signin'))
+
 @app.route('/add-product', methods=['POST'])
 def add_product():
     if 'user_id' not in session:
@@ -226,6 +233,7 @@ def add_product():
         logger.error(f"Error adding product: {str(e)}")
         flash(f"Error: {str(e)}", "error")
         return jsonify({'error': str(e)}), 500
+
 @app.route('/update-product/<product_id>', methods=['POST'])
 def update_product(product_id):
     if 'user_id' not in session:
@@ -246,7 +254,6 @@ def update_product(product_id):
         return jsonify({'error': 'Name and price are required'}), 400
 
     try:
-        # Use 'product_id' instead of 'id'
         product = supabase.table('products').select('*').eq('product_id', product_id).eq('user_id', user_id).execute()
         logger.info(f"Product query result: {product.data}")
         if not product.data:
@@ -257,11 +264,9 @@ def update_product(product_id):
         product_data = {
             'name': name,
             'description': description,
-            'price': float(price),
-            'updated_at': datetime.utcnow().isoformat()
+            'price': float(price)
         }
 
-        # Update using 'product_id'
         response = supabase.table('products').update(product_data).eq('product_id', product_id).execute()
         logger.info(f"Update response: {response.data}")
         if response.data:
@@ -288,6 +293,99 @@ def get_products():
     except Exception as e:
         logger.error(f"Error fetching products: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/add-loan', methods=['POST'])
+def add_loan():
+    logger.info(f"Accessing add-loan, session: {session.get('user_id')}, {session.get('sign_in_as')}")
+    if 'user_id' not in session:
+        logger.error("Unauthorized access: No user_id in session")
+        flash("Please sign in to apply for a loan.", "error")
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user_id = session['user_id']
+    full_name = request.form.get('fullName')
+    age = request.form.get('age')
+    monthly_income = request.form.get('monthlyIncome')
+    occupation = request.form.get('occupation')
+    loan_amount = request.form.get('loanAmount')
+    loan_purpose = request.form.get('loanPurpose')
+    aadhar_number = request.form.get('aadharNumber')
+    pan_number = request.form.get('panNumber')
+
+    logger.info(f"Received loan application: user_id={user_id}, full_name={full_name}, aadhar_number=****{aadhar_number[-4:]}")
+
+    # Validate required fields
+    if not all([full_name, age, monthly_income, occupation, loan_amount, loan_purpose, aadhar_number, pan_number]):
+        logger.error("Missing required fields for loan application")
+        flash("All fields are required.", "error")
+        return jsonify({'error': 'All fields are required'}), 400
+
+    # Validate numeric fields
+    try:
+        age = int(age)
+        monthly_income = float(monthly_income)
+        loan_amount = float(loan_amount)
+        if age < 18:
+            flash("Age must be at least 18.", "error")
+            return jsonify({'error': 'Age must be at least 18'}), 400
+        if monthly_income < 0:
+            flash("Monthly income cannot be negative.", "error")
+            return jsonify({'error': 'Monthly income cannot be negative'}), 400
+        if loan_amount <= 0:
+            flash("Loan amount must be positive.", "error")
+            return jsonify({'error': 'Loan amount must be positive'}), 400
+    except ValueError:
+        logger.error("Invalid numeric input for age, monthly_income, or loan_amount")
+        flash("Age, monthly income, and loan amount must be valid numbers.", "error")
+        return jsonify({'error': 'Invalid numeric input'}), 400
+
+    # Validate Aadhar and PAN numbers
+    if not is_valid_aadhar_number(aadhar_number):
+        logger.error(f"Invalid Aadhar number: ****{aadhar_number[-4:]}")
+        flash("Aadhar number must be a 12-digit number.", "error")
+        return jsonify({'error': 'Invalid Aadhar number'}), 400
+    if not is_valid_pan_number(pan_number):
+        logger.error(f"Invalid PAN number: {pan_number}")
+        flash("PAN number must be in the format ABCDE1234F.", "error")
+        return jsonify({'error': 'Invalid PAN number'}), 400
+
+    try:
+        # Insert loan data
+        loan_data = {
+            'user_id': user_id,
+            'full_name': full_name,
+            'age': age,
+            'monthly_income': monthly_income,
+            'occupation': occupation,
+            'loan_amount': loan_amount,
+            'loan_purpose': loan_purpose,
+            'aadhar_number': aadhar_number,
+            'pan_number': pan_number,
+            'status': 'Pending',
+            'created_at': datetime.utcnow().isoformat()
+        }
+
+        logger.info(f"Inserting loan data: user_id={user_id}, full_name={full_name}, aadhar_number=****{aadhar_number[-4:]}")
+        response = supabase.table('loans').insert(loan_data).execute()
+        logger.info(f"Loan insert response: {response.data}")
+
+        if response.data:
+            flash("Loan application submitted successfully!", "info")
+            return jsonify({'message': 'Loan application submitted successfully', 'loan': response.data[0]}), 200
+        else:
+            logger.error("Failed to insert loan application: No data in response")
+            flash("Failed to submit loan application.", "error")
+            return jsonify({'error': 'Failed to submit loan application'}), 500
+
+    except Exception as e:
+        if 'duplicate key value violates unique constraint "unique_aadhar_number"' in str(e):
+            logger.error(f"Aadhar number already used: ****{aadhar_number[-4:]}")
+            flash("A loan application with this Aadhar number already exists.", "error")
+            return jsonify({'error': 'A loan application with this Aadhar number already exists'}), 400
+        logger.error(f"Error inserting loan application: {str(e)}")
+        flash(f"Error: {str(e)}", "error")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/merchant-profile')
 def merchant_profile():
     if 'user_id' not in session:
@@ -339,115 +437,6 @@ def merchant_profile():
                           account_status=account_status,
                           role=role)
 
-
-@app.route('/add-loan', methods=['POST'])
-def add_loan():
-    if 'user_id' not in session:
-        logger.error("Unauthorized access: No user_id in session")
-        flash("Please sign in to apply for a loan.", "error")
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    user_id = session['user_id']
-    full_name = request.form.get('fullName')
-    age = request.form.get('age')
-    monthly_income = request.form.get('monthlyIncome')
-    occupation = request.form.get('occupation')
-    loan_amount = request.form.get('loanAmount')
-    loan_purpose = request.form.get('loanPurpose')
-    aadhar_number = request.form.get('aadharNumber')
-    pan_number = request.form.get('panNumber')
-    aadhar_file = request.files.get('aadharFile')
-    pan_file = request.files.get('panFile')
-
-    # Validate required fields
-    if not all([full_name, age, monthly_income, occupation, loan_amount, loan_purpose, aadhar_number, pan_number]):
-        logger.error("Missing required fields for loan application")
-        flash("All fields are required.", "error")
-        return jsonify({'error': 'All fields are required'}), 400
-
-    # Validate numeric fields
-    try:
-        age = int(age)
-        monthly_income = float(monthly_income)
-        loan_amount = float(loan_amount)
-        if age < 18:
-            flash("Age must be at least 18.", "error")
-            return jsonify({'error': 'Age must be at least 18'}), 400
-        if monthly_income < 0:
-            flash("Monthly income cannot be negative.", "error")
-            return jsonify({'error': 'Monthly income cannot be negative'}), 400
-        if loan_amount <= 0:
-            flash("Loan amount must be positive.", "error")
-            return jsonify({'error': 'Loan amount must be positive'}), 400
-    except ValueError:
-        logger.error("Invalid numeric input for age, monthly_income, or loan_amount")
-        flash("Age, monthly income, and loan amount must be valid numbers.", "error")
-        return jsonify({'error': 'Invalid numeric input'}), 400
-
-    # Validate Aadhar and PAN numbers
-    if not is_valid_aadhar_number(aadhar_number):
-        logger.error(f"Invalid Aadhar number: {aadhar_number}")
-        flash("Aadhar number must be a 12-digit number.", "error")
-        return jsonify({'error': 'Invalid Aadhar number'}), 400
-    if not is_valid_pan_number(pan_number):
-        logger.error(f"Invalid PAN number: {pan_number}")
-        flash("PAN number must be in the format ABCDE1234F.", "error")
-        return jsonify({'error': 'Invalid PAN number'}), 400
-
-    # Validate file uploads
-    aadhar_file_url = None
-    pan_file_url = None
-    try:
-        if aadhar_file and aadhar_file.filename.endswith('.pdf'):
-            aadhar_filename = f"aadhar/{user_id}/{uuid.uuid4()}.pdf"
-            supabase.storage.from_('loan-documents').upload(aadhar_filename, aadhar_file.read(), {'content-type': 'application/pdf'})
-            aadhar_file_url = supabase.storage.from_('loan-documents').get_public_url(aadhar_filename)
-        else:
-            flash("Aadhar file must be a PDF.", "error")
-            return jsonify({'error': 'Aadhar file must be a PDF'}), 400
-
-        if pan_file and pan_file.filename.endswith('.pdf'):
-            pan_filename = f"pan/{user_id}/{uuid.uuid4()}.pdf"
-            supabase.storage.from_('loan-documents').upload(pan_filename, pan_file.read(), {'content-type': 'application/pdf'})
-            pan_file_url = supabase.storage.from_('loan-documents').get_public_url(pan_filename)
-        else:
-            flash("PAN file must be a PDF.", "error")
-            return jsonify({'error': 'PAN file must be a PDF'}), 400
-    except Exception as e:
-        logger.error(f"Error uploading files to Supabase Storage: {str(e)}")
-        flash(f"Error uploading files: {str(e)}", "error")
-        return jsonify({'error': 'Error uploading files'}), 500
-
-    try:
-        loan_data = {
-            'user_id': user_id,
-            'full_name': full_name,
-            'age': age,
-            'monthly_income': monthly_income,
-            'occupation': occupation,
-            'loan_amount': loan_amount,
-            'loan_purpose': loan_purpose,
-            'aadhar_number': aadhar_number,
-            'aadhar_file': aadhar_file_url,
-            'pan_number': pan_number,
-            'pan_file': pan_file_url,
-            'created_at': datetime.utcnow().isoformat()
-        }
-
-        response = supabase.table('loans').insert(loan_data).execute()
-
-        if response.data:
-            flash("Loan application submitted successfully!", "info")
-            return jsonify({'message': 'Loan application submitted successfully', 'loan': response.data[0]}), 200
-        else:
-            logger.error("Failed to insert loan application: No data in response")
-            flash("Failed to submit loan application.", "error")
-            return jsonify({'error': 'Failed to submit loan application'}), 500
-
-    except Exception as e:
-        logger.error(f"Error inserting loan application: {str(e)}")
-        flash(f"Error: {str(e)}", "error")
-        return jsonify({'error': str(e)}), 500
 @app.route('/loan-profiles')
 def loan_profiles():
     if 'user_id' not in session:
