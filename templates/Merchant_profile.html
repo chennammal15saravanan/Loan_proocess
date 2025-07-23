@@ -98,7 +98,6 @@
     <div class="section">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 class="fw-semibold mb-0">Merchant Profile</h6>
-        <button type="button" id="editProfileBtn" class="btn btn-primary-600 radius-8">Edit Profile</button>
       </div>
       <div class="row gy-4">
         <div class="col-lg-12">
@@ -107,123 +106,115 @@
               <h6 class="text-xl mb-0">Profile Details</h6>
             </div>
             <div class="card-body p-24">
-              <form id="profileForm">
-                <!-- Profile Picture / Store Logo -->
-                <div class="mb-24">
-                  <label class="form-label fw-bold text-neutral-900">Profile Picture / Store Logo (optional):</label>
-                  <div class="upload-image-wrapper">
-                    <div class="uploaded-img d-none position-relative h-160-px w-100 border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50">
-                      <button type="button" class="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex bg-danger-600 w-40-px h-40-px justify-content-center align-items-center rounded-circle">
-                        <iconify-icon icon="radix-icons:cross-2" class="text-2xl text-white"></iconify-icon>
-                      </button>
-                      <img id="profile-img__preview" class="w-100 h-100 object-fit-cover" src="assets/images/user.png" alt="profile image">
-                    </div>
-                    <label class="upload-file h-160-px w-100 border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1" for="profile-upload">
-                      <iconify-icon icon="solar:camera-outline" class="text-xl text-secondary-light"></iconify-icon>
-                      <span class="fw-semibold text-secondary-light">Upload Image</span>
-                      <input id="profile-upload" type="file" name="profile_image" disabled>
-                    </label>
+              <!-- Profile Picture / Store Logo -->
+              <div class="mb-24">
+                <label class="form-label fw-bold text-neutral-900">Profile Picture / Store Logo (optional):</label>
+                <div class="upload-image-wrapper">
+                  <div class="uploaded-img d-none position-relative h-160-px w-100 border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50">
+                    <button type="button" class="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex bg-danger-600 w-40-px h-40-px justify-content-center align-items-center rounded-circle">
+                      <iconify-icon icon="radix-icons:cross-2" class="text-2xl text-white"></iconify-icon>
+                    </button>
+                    <img id="profile-img__preview" class="w-100 h-100 object-fit-cover" src="assets/images/user.png" alt="profile image">
+                  </div>
+                  <label class="upload-file h-160-px w-100 border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1" for="profile-upload">
+                    <iconify-icon icon="solar:camera-outline" class="text-xl text-secondary-light"></iconify-icon>
+                    <span class="fw-semibold text-secondary-light">Upload Image</span>
+                    <input id="profile-upload" type="file" hidden>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Basic Information -->
+              <div class="mb-24">
+                <h6 class="fw-semibold mb-12">🔹 Basic Information:</h6>
+                <div class="row gy-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Merchant ID:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ merchant_id }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Business Name:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ business_name }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Owner Name:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ username }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Email Address:</label>
+                    <input type="email" class="form-control border border-neutral-200 radius-8" value="{{ email }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Phone Number:</label>
+                    <input type="tel" class="form-control border border-neutral-200 radius-8" value="{{ phone_number }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Age:</label>
+                    <input type="number" class="form-control border border-neutral-200 radius-8" value="{{ age }}" readonly>
                   </div>
                 </div>
+              </div>
 
-                <!-- Basic Information -->
-                <div class="mb-24">
-                  <h6 class="fw-semibold mb-12">🔹 Basic Information:</h6>
-                  <div class="row gy-3">
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Merchant ID:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="merchant_id" value="{{ merchant_id }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Business Name:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="business_name" value="{{ business_name }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Owner Name:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="owner_name" value="{{ username }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Email Address:</label>
-                      <input type="email" class="form-control border border-neutral-200 radius-8" name="email" value="{{ email }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Phone Number:</label>
-                      <input type="tel" class="form-control border border-neutral-200 radius-8" name="phone_number" value="{{ phone_number }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Age:</label>
-                      <input type="number" class="form-control border border-neutral-200 radius-8" name="age" value="{{ age }}" readonly>
-                    </div>
+              <!-- Business Details -->
+              <div class="mb-24">
+                <h6 class="fw-semibold mb-12">🔹 Business Details:</h6>
+                <div class="row gy-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Business Type:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ business_type }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Business Category:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ business_category }}" readonly>
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label fw-bold text-neutral-900">Business Address:</label>
+                    <textarea class="form-control border border-neutral-200 radius-8" rows="3" readonly>{{ business_address }}</textarea>
                   </div>
                 </div>
+              </div>
 
-                <!-- Business Details -->
-                <div class="mb-24">
-                  <h6 class="fw-semibold mb-12">🔹 Business Details:</h6>
-                  <div class="row gy-3">
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Business Type:</label>
-                      <select class="form-control border border-neutral-200 radius-8" name="business_type" disabled>
-                        <option value="" disabled>Select Type</option>
-                        <option value="Retail" {{ 'selected' if business_type == 'Retail' }}>Retail</option>
-                        <option value="Wholesale" {{ 'selected' if business_type == 'Wholesale' }}>Wholesale</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Business Category:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="business_category" value="{{ business_category }}" readonly>
-                    </div>
-                    <div class="col-md-12">
-                      <label class="form-label fw-bold text-neutral-900">Business Address:</label>
-                      <textarea class="form-control border border-neutral-200 radius-8" name="business_address" rows="3" readonly>{{ business_address }}</textarea>
-                    </div>
+              <!-- Financial Details -->
+              <div class="mb-24">
+                <h6 class="fw-semibold mb-12">🔹 Financial Details:</h6>
+                <div class="row gy-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">GST Number:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ gst_number }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">PAN Number:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ pan_number }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Bank Name:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ bank_name }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Account Number:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ account_number }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">IFSC Code:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ ifsc_code }}" readonly>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">UPI ID (optional):</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ upi_id }}" readonly>
                   </div>
                 </div>
+              </div>
 
-                <!-- Financial Details -->
-                <div class="mb-24">
-                  <h6 class="fw-semibold mb-12">🔹 Financial Details:</h6>
-                  <div class="row gy-3">
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">GST Number:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="gst_number" value="{{ gst_number }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">PAN Number:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="pan_number" value="{{ pan_number }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Bank Name:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="bank_name" value="{{ bank_name }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Account Number:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="account_number" value="{{ account_number }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">IFSC Code:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="ifsc_code" value="{{ ifsc_code }}" readonly>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">UPI ID (optional):</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="upi_id" value="{{ upi_id }}" readonly>
-                    </div>
+              <!-- Account Status -->
+              <div>
+                <h6 class="fw-semibold mb-12">🔹 Account Status:</h6>
+                <div class="row gy-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold text-neutral-900">Status:</label>
+                    <input type="text" class="form-control border border-neutral-200 radius-8" value="{{ account_status }}" readonly>
                   </div>
                 </div>
-
-                <!-- Account Status -->
-                <div>
-                  <h6 class="fw-semibold mb-12">🔹 Account Status:</h6>
-                  <div class="row gy-3">
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold text-neutral-900">Status:</label>
-                      <input type="text" class="form-control border border-neutral-200 radius-8" name="account_status" value="{{ account_status }}" readonly>
-                    </div>
-                  </div>
-                </div>
-
-                <button type="button" id="saveProfileBtn" class="btn btn-success radius-8 mt-24 d-none">Save Changes</button>
-              </form>
+              </div>
             </div>
           </div>
         </div>
@@ -255,10 +246,6 @@
   const profilePreview = document.getElementById("profile-img__preview");
   const profileImgContainer = profilePreview.parentElement;
   const profileRemoveButton = profileImgContainer.querySelector(".uploaded-img__remove");
-  const editProfileBtn = document.getElementById("editProfileBtn");
-  const saveProfileBtn = document.getElementById("saveProfileBtn");
-  const profileForm = document.getElementById("profileForm");
-  const inputs = profileForm.querySelectorAll("input, textarea, select");
 
   profileInput.addEventListener("change", (e) => {
     if (e.target.files.length) {
@@ -274,34 +261,8 @@
     profileInput.value = "";
   });
 
-  // Toggle Edit Mode
-  editProfileBtn.addEventListener("click", () => {
-    inputs.forEach(input => {
-      input.removeAttribute("readonly");
-      input.removeAttribute("disabled");
-      input.classList.add("border-primary-600");
-    });
-    editProfileBtn.classList.add("d-none");
-    saveProfileBtn.classList.remove("d-none");
-  });
-
-  // Placeholder for Save Action (to be implemented with Supabase later)
-  saveProfileBtn.addEventListener("click", () => {
-    alert("Save functionality will be implemented with Supabase later. Changes are not saved yet.");
-    // Revert to readonly mode
-    inputs.forEach(input => {
-      if (input.name !== "merchant_id" && input.name !== "owner_name" && input.name !== "email" && input.name !== "account_status") {
-        input.setAttribute("readonly", true);
-      }
-      if (input.type === "file") {
-        input.setAttribute("disabled", true);
-      }
-      input.classList.remove("border-primary-600");
-    });
-    saveProfileBtn.classList.add("d-none");
-    editProfileBtn.classList.remove("d-none");
-    profileImgContainer.classList.add('d-none'); // Reset image preview
-    profileInput.value = ""; // Clear file input
+  document.addEventListener('DOMContentLoaded', () => {
+    // Ensure the profile section is visible by default
   });
 </script>
 </body>
