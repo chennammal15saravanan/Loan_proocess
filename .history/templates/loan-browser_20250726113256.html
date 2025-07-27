@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Dashboard</title>
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" sizes="16x16">
+  <link rel="stylesheet" href="assets/css/remixicon.css">
+  <link rel="stylesheet" href="assets/css/lib/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/lib/magnific-popup.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<aside class="sidebar">
+  <button type="button" class="sidebar-close-btn">
+    <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+  </button>
+  <div>
+    <a href="index.html" class="sidebar-logo">
+      <img src="assets/images/logo.png" alt="site logo" class="light-logo">
+      <img src="assets/images/logo-light.png" alt="site logo" class="dark-logo">
+      <img src="assets/images/logo-icon.png" alt="site logo" class="logo-icon">
+    </a>
+  </div>
+  <div class="sidebar-menu-area">
+    <ul class="sidebar-menu" id="sidebar-menu">
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <iconify-icon icon="solar:home-smile-angle-outline" class="menu-icon"></iconify-icon>
+          <span>Loan Dashboard</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li>
+            <a href="#apply-loan"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Apply for Loan</a>
+          </li>
+          <li>
+            <a href="#view-loan"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> View Loan</a>
+          </li>
+          <li>
+        <button id="viewProductsBtn" class="btn btn-link text-start px-0" style="color: #5c5c5c; background: none; border: none;">
+          <i class="ri-circle-fill circle-icon text-success w-auto"></i> View Products
+        </button>
+      </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <div class="navbar-header">
+    <div class="row align-items-center justify-content-between">
+      <div class="col-auto">
+        <div class="d-flex flex-wrap align-items-center gap-4">
+          <button type="button" class="sidebar-toggle">
+            <iconify-icon icon="heroicons:bars-3-solid" class="icon text-2xl non-active"></iconify-icon>
+            <iconify-icon icon="iconoir:arrow-right" class="icon text-2xl active"></iconify-icon>
+          </button>
+          <button type="button" class="sidebar-mobile-toggle">
+            <iconify-icon icon="heroicons:bars-3-solid" class="icon"></iconify-icon>
+          </button>
+          <form class="navbar-search">
+            <input type="text" name="search" placeholder="Search">
+            <iconify-icon icon="ion:search-outline" class="icon"></iconify-icon>
+          </form>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          <button type="button" data-theme-toggle class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"></button>
+          <div class="dropdown">
+            <button class="d-flex justify-content-center align-items-center rounded-circle" type="button" data-bs-toggle="dropdown">
+              <img src="assets/images/user.png" alt="image" class="w-40-px h-40-px object-fit-cover rounded-circle">
+            </button>
+            <div class="dropdown-menu to-top dropdown-menu-sm">
+              <div class="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
+                <div>
+                  <h6 class="text-lg text-primary-light fw-semibold mb-2">{{ username }}</h6>
+                  <span class="text-secondary-light fw-medium text-sm">{{ role | capitalize }}</span>
+                </div>
+                <button type="button" class="hover-text-danger">
+                  <iconify-icon icon="radix-icons:cross-1" class="icon text-xl"></iconify-icon> 
+                </button>
+              </div>
+              <ul class="to-top-list">
+                <li>
+                  <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3" href="{{ url_for('loan_profiles') }}"> 
+                    <iconify-icon icon="solar:user-linear" class="icon text-xl"></iconify-icon> My Profile</a>
+                </li>
+                <li>
+                  <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3" href="{{ url_for('logout') }}"> 
+                    <iconify-icon icon="lucide:power" class="icon text-xl"></iconify-icon> Log Out</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-main-body" id="content-section">
+    <!-- Flash Messages -->
+    <div id="flash-messages" class="mb-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <!-- Welcome Dashboard Section -->
+    <div id="welcome-dashboard" class="section">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Welcome Dashboard</h6>
+        <ul class="d-flex align-items-center gap-2">
+          <li class="fw-medium">Hello, <span>{{ username }}</span>!</li>
+        </ul>
+      </div>
+      <div class="row gy-4">
+        <div class="col-lg-12">
+          <div class="card mt-24">
+            <div class="card-body p-24">
+              <!-- Blank content for welcome dashboard -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apply for Loan Section -->
+    <div id="apply-loan" class="section" style="display: none;">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">Add Loan</h6>
+        <div class="d-flex gap-2">
+          <a href="#dashboard" class="btn btn-primary-600 radius-8">Dashboard</a>
+          <a href="#apply-loan" class="btn btn-primary-600 radius-8">Add Loan</a>
+        </div>
+      </div>
+      <div class="row gy-4">
+        <div class="col-lg-12">
+          <div class="card mt-24">
+            <div class="card-body p-24">
+              <h6 class="card-title mb-16">Loan Application</h6>
+              <div class="d-flex flex-wrap gap-3">
+                <button type="button" class="btn btn-primary-600 radius-8" data-bs-toggle="modal" data-bs-target="#loanModal">Add Loan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Loan Section -->
+<!-- View Loan Section -->
+<div id="view-loan" class="section" style="display: none;">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">View Loan Status</h6>
+    <button type="button" class="btn btn-primary-600 radius-8" onclick="fetchLoans()">Refresh</button>
+  </div>
+  <div class="row gy-4">
+    <div class="col-lg-12">
+      <div class="card mt-24">
+        <div class="card-body p-24">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Loan ID</th>
+                  <th>Amount</th>
+                  <th>Purpose</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="loanTableBody">
+                <!-- Loan rows will be inserted here by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add new View Products section -->
+<div id="view-products" class="section" style="display: none;">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+    <h6 class="fw-semibold mb-0">View Products</h6>
+    <div class="d-flex gap-2">
+      <input type="text" class="form-control" id="productSearch" placeholder="Search products...">
+    </div>
+  </div>
+  <div class="row gy-4">
+    <div class="col-lg-12">
+      <div class="card mt-24">
+        <div class="card-body p-24">
+          <div id="productList" class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Price</th>
+                  <th>Merchant</th>
+                </tr>
+              </thead>
+              <tbody id="productTableBody">
+                <!-- Products will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Loan Application Modal -->
+<div class="modal fade" id="loanModal" tabindex="-1" aria-labelledby="loanModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loanModalLabel">Loan Application Form</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loanForm" enctype="multipart/form-data" class="d-flex flex-column gap-20">
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="first_name">First Name:</label>
+            <input type="text" class="form-control border border-neutral-200 radius-8" id="first_name" name="first_name" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="last_name">Last Name:</label>
+            <input type="text" class="form-control border border-neutral-200 radius-8" id="last_name" name="last_name" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="dob">Date of Birth:</label>
+            <input type="date" class="form-control border border-neutral-200 radius-8" id="dob" name="dob" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="age">Age:</label>
+            <input type="number" class="form-control border border-neutral-200 radius-8" id="age" name="age" min="18" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="phone">Phone Number:</label>
+            <input type="tel" class="form-control border border-neutral-200 radius-8" id="phone" name="phone" pattern="\+?\d{10,15}" title="Phone number must be 10-15 digits, optionally starting with +" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="address">Address:</label>
+            <textarea class="form-control border border-neutral-200 radius-8" id="address" name="address" required></textarea>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="occupation">Occupation:</label>
+            <input type="text" class="form-control border border-neutral-200 radius-8" id="occupation" name="occupation" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="monthlyIncome">Monthly Income:</label>
+            <input type="number" class="form-control border border-neutral-200 radius-8" id="monthlyIncome" name="monthlyIncome" min="0" step="0.01" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="loanAmount">Loan Amount:</label>
+            <input type="number" class="form-control border border-neutral-200 radius-8" id="loanAmount" name="loanAmount" min="1" step="0.01" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="loanPurpose">Loan Purpose:</label>
+            <select class="form-control border border-neutral-200 radius-8" id="loanPurpose" name="loanPurpose" required>
+              <option value="" disabled selected>Select Purpose</option>
+              <option value="Personal">Personal Loan</option>
+              <option value="Business">Business Loan</option>
+              <option value="Home">Home Loan</option>
+              <option value="Education">Education Loan</option>
+              <option value="Medical">Medical Loan</option>
+              <option value="Vehicle">Vehicle Loan</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="aadharNumber">Aadhar Number:</label>
+            <input type="text" class="form-control border border-neutral-200 radius-8" id="aadharNumber" name="aadharNumber" pattern="\d{12}" title="Aadhar number must be a 12-digit number" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="aadharFile">Aadhar Upload:</label>
+            <input type="file" class="form-control border border-neutral-200 radius-8" id="aadharFile" name="aadharFile" accept=".pdf" required>
+            <small class="form-text text-muted">Upload Aadhar (PDF only, max 5MB)</small>
+            <div class="invalid-feedback">Please upload a valid PDF file.</div>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="panNumber">PAN Number:</label>
+            <input type="text" class="form-control border border-neutral-200 radius-8" id="panNumber" name="panNumber" pattern="[A-Z]{5}\d{4}[A-Z]{1}" title="PAN number must be in the format ABCDE1234F" required>
+          </div>
+          <div>
+            <label class="form-label fw-bold text-neutral-900" for="panFile">PAN Upload:</label>
+            <input type="file" class="form-control border border-neutral-200 radius-8" id="panFile" name="panFile" accept=".pdf" required>
+            <small class="form-text text-muted">Upload PAN (PDF only, max 5MB)</small>
+            <div class="invalid-feedback">Please upload a valid PDF file.</div>
+          </div>
+          <div class="d-flex gap-3">
+            <button type="button" class="btn btn-secondary radius-8" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary-600 radius-8">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+ 
+</main>
+
+<script src="assets/js/lib/jquery-3.7.1.min.js"></script>
+<script src="assets/js/lib/bootstrap.bundle.min.js"></script>
+<script src="assets/js/lib/iconify-icon.min.js"></script>
+<script src="assets/js/lib/magnific-popup.min.js"></script>
+<script src="assets/js/app.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('welcome-dashboard').style.display = 'block';
+
+    // Client-side validation for Aadhar and PAN
+    document.getElementById('aadharNumber').addEventListener('input', (e) => {
+      const aadharRegex = /^\d{12}$/;
+      if (!aadharRegex.test(e.target.value)) {
+        e.target.setCustomValidity('Aadhar number must be a 12-digit number.');
+      } else {
+        e.target.setCustomValidity('');
+      }
+    });
+
+    document.getElementById('panNumber').addEventListener('input', (e) => {
+      const panRegex = /^[A-Z]{5}\d{4}[A-Z]{1}$/;
+      if (!panRegex.test(e.target.value)) {
+        e.target.setCustomValidity('PAN number must be in the format ABCDE1234F.');
+      } else {
+        e.target.setCustomValidity('');
+      }
+    });
+
+    // Client-side file size validation
+    document.getElementById('aadharFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.size > 5 * 1024 * 1024) {
+        alert('Aadhar file size must be less than 5MB.');
+        e.target.value = '';
+      }
+    });
+    document.getElementById('panFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.size > 5 * 1024 * 1024) {
+        alert('PAN file size must be less than 5MB.');
+        e.target.value = '';
+      }
+    });
+
+    // Handle sidebar navigation
+    document.querySelectorAll('.sidebar-submenu a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = link.getAttribute('href').substring(1);
+        document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
+        document.getElementById(href).style.display = 'block';
+        if (href === 'view-loan') {
+          fetchLoans();
+        } else if (href === 'view-products') {
+          fetchProducts();
+        }
+      });
+    });
+
+    // Handle Loan Form Submission
+    const loanForm = document.getElementById('loanForm');
+    const loanModal = new bootstrap.Modal(document.getElementById('loanModal'));
+
+    loanForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(loanForm);
+
+      fetch('/add-loan', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.status === 401) {
+          alert('Please sign in to continue.');
+          window.location.href = '/sign-in';
+          return;
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.error) {
+          alert(data.error);
+        } else if (data) {
+          loanModal.hide();
+          loanForm.reset();
+          // Show success message in the UI
+          const successMessage = document.createElement('div');
+          successMessage.className = 'alert alert-success alert-dismissible fade show';
+          successMessage.innerHTML = `
+            Loan application submitted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.getElementById('apply-loan').prepend(successMessage);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the loan application.');
+      });
+    });
+
+    // Fetch and Render Loans
+ function fetchLoans() {
+  fetch('/get-user-loans')
+    .then(response => {
+      if (response.status === 401) {
+        alert('Please sign in to continue.');
+        window.location.href = '/sign-in';
+        return;
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data && data.loans) {
+        const loanTableBody = document.getElementById('loanTableBody');
+        loanTableBody.innerHTML = '';
+        data.loans.forEach(loan => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${loan.loan_id}</td>
+            <td>₹${parseFloat(loan.amount).toFixed(2)}</td>
+            <td>${loan.purpose || 'N/A'}</td>
+            <td>
+              <span class="badge bg-${
+                loan.status.toLowerCase() === 'pending' ? 'warning' :
+                loan.status.toLowerCase() === 'accepted' ? 'success' : 'danger'
+              }">${loan.status}</span>
+            </td>
+          `;
+          loanTableBody.appendChild(row);
+        });
+      } else {
+        const loanTableBody = document.getElementById('loanTableBody');
+        loanTableBody.innerHTML = '<tr><td colspan="4">No loans found.</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching loans:', error);
+      alert('Error fetching loans.');
+      const loanTableBody = document.getElementById('loanTableBody');
+      loanTableBody.innerHTML = '<tr><td colspan="4">Error loading loans.</td></tr>';
+    });
+}
+
+
+  // Fetch and Render Products
+
+    function fetchMerchantProducts() {
+    fetch('/get-all-products')
+      .then(response => response.json())
+      .then(data => {
+        const productTableBody = document.getElementById('productTableBody');
+        productTableBody.innerHTML = '';
+        data.products.forEach(product => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${product.name}</td>
+            <td>${product.description || 'N/A'}</td>
+            <td>₹${parseFloat(product.price).toFixed(2)}</td>
+            <td>${product.merchant_name}</td>
+          `;
+          productTableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+      });
+  }
+
+  // Trigger when View Products button is clicked
+  document.getElementById('viewProductsBtn').addEventListener('click', () => {
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+    document.getElementById('view-products').style.display = 'block';
+    fetchMerchantProducts();
+  });
+
+  // Optional: Live Search
+  document.getElementById('productSearch').addEventListener('input', function () {
+    const filter = this.value.toLowerCase();
+    document.querySelectorAll('#productTableBody tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? '' : 'none';
+    });
+  });
+
+    // Handle Product Search
+    document.getElementById('productSearch').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#productTableBody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>

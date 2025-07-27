@@ -37,10 +37,10 @@
             <a href="#view-loan"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> View Loan</a>
           </li>
           <li>
-        <button id="viewProductsBtn" class="btn btn-link text-start px-0" style="color: #5c5c5c; background: none; border: none;">
-          <i class="ri-circle-fill circle-icon text-success w-auto"></i> View Products
-        </button>
-      </li>
+            <button id="viewProductsBtn" class="btn btn-link text-start px-0" style="color: #5c5c5c; background: none; border: none;">
+              <i class="ri-circle-fill circle-icon text-success w-auto"></i> View Products
+            </button>
+          </li>
         </ul>
       </li>
     </ul>
@@ -157,133 +157,159 @@
     </div>
 
     <!-- View Loan Section -->
-    <<!-- View Loan Section -->
-<div id="view-loan" class="section" style="display: none;">
-  <!-- Existing View Loan content -->
-</div>
-
-<!-- Add new View Products section -->
-<div id="view-products" class="section" style="display: none;">
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
-    <h6 class="fw-semibold mb-0">View Products</h6>
-    <div class="d-flex gap-2">
-      <input type="text" class="form-control" id="productSearch" placeholder="Search products...">
-    </div>
-  </div>
-  <div class="row gy-4">
-    <div class="col-lg-12">
-      <div class="card mt-24">
-        <div class="card-body p-24">
-          <div id="productList" class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Price</th>
-                  <th>Merchant</th>
-                </tr>
-              </thead>
-              <tbody id="productTableBody">
-                <!-- Products will be populated here -->
-              </tbody>
-            </table>
+    <div id="view-loan" class="section" style="display: none;">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">View Loan</h6>
+        <div class="d-flex gap-2">
+          <a href="#dashboard" class="btn btn-primary-600 radius-8">Dashboard</a>
+          <a href="#view-loan" class="btn btn-primary-600 radius-8">View Loan</a>
+        </div>
+      </div>
+      <div class="row gy-4">
+        <div class="col-lg-12">
+          <div class="card mt-24">
+            <div class="card-body p-24">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Loan ID</th>
+                      <th>Amount</th>
+                      <th>Purpose</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="loanTableBody">
+                    <!-- Loans will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-    <!-- Loan Application Modal -->
-<div class="modal fade" id="loanModal" tabindex="-1" aria-labelledby="loanModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="loanModalLabel">Loan Application Form</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- View Products Section -->
+    <div id="view-products" class="section" style="display: none;">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
+        <h6 class="fw-semibold mb-0">View Products</h6>
+        <div class="d-flex gap-2">
+          <input type="text" class="form-control" id="productSearch" placeholder="Search products...">
+        </div>
       </div>
-      <div class="modal-body">
-        <form id="loanForm" enctype="multipart/form-data" class="d-flex flex-column gap-20">
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="first_name">First Name:</label>
-            <input type="text" class="form-control border border-neutral-200 radius-8" id="first_name" name="first_name" required>
+      <div class="row gy-4">
+        <div class="col-lg-12">
+          <div class="card mt-24">
+            <div class="card-body p-24">
+              <div id="productList" class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Price</th>
+                      <th>Merchant</th>
+                    </tr>
+                  </thead>
+                  <tbody id="productTableBody">
+                    <!-- Products will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="last_name">Last Name:</label>
-            <input type="text" class="form-control border border-neutral-200 radius-8" id="last_name" name="last_name" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="dob">Date of Birth:</label>
-            <input type="date" class="form-control border border-neutral-200 radius-8" id="dob" name="dob" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="age">Age:</label>
-            <input type="number" class="form-control border border-neutral-200 radius-8" id="age" name="age" min="18" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="phone">Phone Number:</label>
-            <input type="tel" class="form-control border border-neutral-200 radius-8" id="phone" name="phone" pattern="\+?\d{10,15}" title="Phone number must be 10-15 digits, optionally starting with +" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="address">Address:</label>
-            <textarea class="form-control border border-neutral-200 radius-8" id="address" name="address" required></textarea>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="occupation">Occupation:</label>
-            <input type="text" class="form-control border border-neutral-200 radius-8" id="occupation" name="occupation" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="monthlyIncome">Monthly Income:</label>
-            <input type="number" class="form-control border border-neutral-200 radius-8" id="monthlyIncome" name="monthlyIncome" min="0" step="0.01" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="loanAmount">Loan Amount:</label>
-            <input type="number" class="form-control border border-neutral-200 radius-8" id="loanAmount" name="loanAmount" min="1" step="0.01" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="loanPurpose">Loan Purpose:</label>
-            <select class="form-control border border-neutral-200 radius-8" id="loanPurpose" name="loanPurpose" required>
-              <option value="" disabled selected>Select Purpose</option>
-              <option value="Personal">Personal Loan</option>
-              <option value="Business">Business Loan</option>
-              <option value="Home">Home Loan</option>
-              <option value="Education">Education Loan</option>
-              <option value="Medical">Medical Loan</option>
-              <option value="Vehicle">Vehicle Loan</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="aadharNumber">Aadhar Number:</label>
-            <input type="text" class="form-control border border-neutral-200 radius-8" id="aadharNumber" name="aadharNumber" pattern="\d{12}" title="Aadhar number must be a 12-digit number" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="aadharFile">Aadhar Upload:</label>
-            <input type="file" class="form-control border border-neutral-200 radius-8" id="aadharFile" name="aadharFile" accept=".pdf" required>
-            <small class="form-text text-muted">Upload Aadhar (PDF only, max 5MB)</small>
-            <div class="invalid-feedback">Please upload a valid PDF file.</div>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="panNumber">PAN Number:</label>
-            <input type="text" class="form-control border border-neutral-200 radius-8" id="panNumber" name="panNumber" pattern="[A-Z]{5}\d{4}[A-Z]{1}" title="PAN number must be in the format ABCDE1234F" required>
-          </div>
-          <div>
-            <label class="form-label fw-bold text-neutral-900" for="panFile">PAN Upload:</label>
-            <input type="file" class="form-control border border-neutral-200 radius-8" id="panFile" name="panFile" accept=".pdf" required>
-            <small class="form-text text-muted">Upload PAN (PDF only, max 5MB)</small>
-            <div class="invalid-feedback">Please upload a valid PDF file.</div>
-          </div>
-          <div class="d-flex gap-3">
-            <button type="button" class="btn btn-secondary radius-8" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary-600 radius-8">Submit</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
- 
+    <!-- Loan Application Modal -->
+    <div class="modal fade" id="loanModal" tabindex="-1" aria-labelledby="loanModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loanModalLabel">Loan Application Form</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="loanForm" enctype="multipart/form-data" class="d-flex flex-column gap-20">
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="first_name">First Name:</label>
+                <input type="text" class="form-control border border-neutral-200 radius-8" id="first_name" name="first_name" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="last_name">Last Name:</label>
+                <input type="text" class="form-control border border-neutral-200 radius-8" id="last_name" name="last_name" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="dob">Date of Birth:</label>
+                <input type="date" class="form-control border border-neutral-200 radius-8" id="dob" name="dob" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="age">Age:</label>
+                <input type="number" class="form-control border border-neutral-200 radius-8" id="age" name="age" min="18" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="phone">Phone Number:</label>
+                <input type="tel" class="form-control border border-neutral-200 radius-8" id="phone" name="phone" pattern="\+?\d{10,15}" title="Phone number must be 10-15 digits, optionally starting with +" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="address">Address:</label>
+                <textarea class="form-control border border-neutral-200 radius-8" id="address" name="address" required></textarea>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="occupation">Occupation:</label>
+                <input type="text" class="form-control border border-neutral-200 radius-8" id="occupation" name="occupation" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="monthlyIncome">Monthly Income:</label>
+                <input type="number" class="form-control border border-neutral-200 radius-8" id="monthlyIncome" name="monthlyIncome" min="0" step="0.01" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="loanAmount">Loan Amount:</label>
+                <input type="number" class="form-control border border-neutral-200 radius-8" id="loanAmount" name="loanAmount" min="1" step="0.01" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="loanPurpose">Loan Purpose:</label>
+                <select class="form-control border border-neutral-200 radius-8" id="loanPurpose" name="loanPurpose" required>
+                  <option value="" disabled selected>Select Purpose</option>
+                  <option value="Personal">Personal Loan</option>
+                  <option value="Business">Business Loan</option>
+                  <option value="Home">Home Loan</option>
+                  <option value="Education">Education Loan</option>
+                  <option value="Medical">Medical Loan</option>
+                  <option value="Vehicle">Vehicle Loan</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="aadharNumber">Aadhar Number:</label>
+                <input type="text" class="form-control border border-neutral-200 radius-8" id="aadharNumber" name="aadharNumber" pattern="\d{12}" title="Aadhar number must be a 12-digit number" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="aadharFile">Aadhar Upload:</label>
+                <input type="file" class="form-control border border-neutral-200 radius-8" id="aadharFile" name="aadharFile" accept=".pdf" required>
+                <small class="form-text text-muted">Upload Aadhar (PDF only, max 5MB)</small>
+                <div class="invalid-feedback">Please upload a valid PDF file.</div>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="panNumber">PAN Number:</label>
+                <input type="text" class="form-control border border-neutral-200 radius-8" id="panNumber" name="panNumber" pattern="[A-Z]{5}\d{4}[A-Z]{1}" title="PAN number must be in the format ABCDE1234F" required>
+              </div>
+              <div>
+                <label class="form-label fw-bold text-neutral-900" for="panFile">PAN Upload:</label>
+                <input type="file" class="form-control border border-neutral-200 radius-8" id="panFile" name="panFile" accept=".pdf" required>
+                <small class="form-text text-muted">Upload PAN (PDF only, max 5MB)</small>
+                <div class="invalid-feedback">Please upload a valid PDF file.</div>
+              </div>
+              <div class="d-flex gap-3">
+                <button type="button" class="btn btn-secondary radius-8" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary-600 radius-8">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 </main>
 
 <script src="assets/js/lib/jquery-3.7.1.min.js"></script>
@@ -337,60 +363,41 @@
         e.preventDefault();
         const href = link.getAttribute('href').substring(1);
         document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
-        document.getElementById(href).style.display = 'block';
-        if (href === 'view-loan') {
-          fetchLoans();
-        } else if (href === 'view-products') {
-          fetchProducts();
+        const section = document.getElementById(href);
+        if (section) {
+          section.style.display = 'block';
+          if (href === 'view-loan') {
+            fetchLoans();
+          } else if (href === 'view-products') {
+            fetchProducts();
+          }
         }
       });
+    });
+
+    // Handle View Products button click
+    document.getElementById('viewProductsBtn').addEventListener('click', () => {
+      document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+      const viewProductsSection = document.getElementById('view-products');
+      if (viewProductsSection) {
+        viewProductsSection.style.display = 'block';
+        fetchProducts();
+      }
     });
 
     // Handle Loan Form Submission
     const loanForm = document.getElementById('loanForm');
     const loanModal = new bootstrap.Modal(document.getElementById('loanModal'));
 
-    loanForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(loanForm);
+    if (loanForm) {
+      loanForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(loanForm);
 
-      fetch('/add-loan', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-        if (response.status === 401) {
-          alert('Please sign in to continue.');
-          window.location.href = '/sign-in';
-          return;
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data && data.error) {
-          alert(data.error);
-        } else if (data) {
-          loanModal.hide();
-          loanForm.reset();
-          // Show success message in the UI
-          const successMessage = document.createElement('div');
-          successMessage.className = 'alert alert-success alert-dismissible fade show';
-          successMessage.innerHTML = `
-            Loan application submitted successfully!
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          `;
-          document.getElementById('apply-loan').prepend(successMessage);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while submitting the loan application.');
-      });
-    });
-
-    // Fetch and Render Loans
-    function fetchLoans() {
-      fetch('/get-user-loans') // Updated to use correct endpoint
+        fetch('/add-loan', {
+          method: 'POST',
+          body: formData
+        })
         .then(response => {
           if (response.status === 401) {
             alert('Please sign in to continue.');
@@ -400,77 +407,118 @@
           return response.json();
         })
         .then(data => {
-          if (data) {
-            const loanTableBody = document.getElementById('loanTableBody');
-            loanTableBody.innerHTML = '';
+          if (data && data.error) {
+            alert(data.error);
+          } else if (data) {
+            loanModal.hide();
+            loanForm.reset();
+            const successMessage = document.createElement('div');
+            successMessage.className = 'alert alert-success alert-dismissible fade show';
+            successMessage.innerHTML = `
+              Loan application submitted successfully!
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.getElementById('apply-loan').prepend(successMessage);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while submitting the loan application.');
+        });
+      });
+    }
+
+    // Fetch and Render Loans
+    function fetchLoans() {
+      const loanTableBody = document.getElementById('loanTableBody');
+      if (!loanTableBody) {
+        console.warn('loanTableBody element not found');
+        return;
+      }
+
+      fetch('/get-user-loans')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          loanTableBody.innerHTML = '';
+          if (data.loans && data.loans.length > 0) {
             data.loans.forEach(loan => {
               const row = document.createElement('tr');
               row.innerHTML = `
-                <td>${loan.loan_id}</td>
-                <td>$${parseFloat(loan.amount).toFixed(2)}</td>
-                <td>${loan.purpose}</td>
+                <td>${loan.loan_id || 'N/A'}</td>
+                <td>$${parseFloat(loan.amount || 0).toFixed(2)}</td>
+                <td>${loan.purpose || 'N/A'}</td>
                 <td><span class="badge bg-${
                   loan.status.toLowerCase() === 'pending' ? 'warning' :
                   loan.status.toLowerCase() === 'accepted' ? 'success' : 'danger'
-                }">${loan.status}</span></td>
+                }">${loan.status || 'N/A'}</span></td>
               `;
               loanTableBody.appendChild(row);
             });
+          } else {
+            loanTableBody.innerHTML = '<tr><td colspan="4">No loans found.</td></tr>';
           }
         })
         .catch(error => {
           console.error('Error fetching loans:', error);
-          alert('Error fetching loans.');
+          loanTableBody.innerHTML = '<tr><td colspan="4">Failed to load loans.</td></tr>';
         });
     }
 
-     function fetchMerchantProducts() {
-    fetch('/get-all-products')
-      .then(response => response.json())
-      .then(data => {
-        const productTableBody = document.getElementById('productTableBody');
-        productTableBody.innerHTML = '';
-        data.products.forEach(product => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${product.name}</td>
-            <td>${product.description || 'N/A'}</td>
-            <td>₹${parseFloat(product.price).toFixed(2)}</td>
-            <td>${product.merchant_name}</td>
-          `;
-          productTableBody.appendChild(row);
+    // Fetch and Render Products
+    function fetchProducts() {
+      const productTableBody = document.getElementById('productTableBody');
+      if (!productTableBody) {
+        console.warn('productTableBody element not found');
+        return;
+      }
+
+      fetch('/get-all-products')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          productTableBody.innerHTML = '';
+          if (data.products && data.products.length > 0) {
+            data.products.forEach(product => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${product.name || 'N/A'}</td>
+                <td>${product.description || 'N/A'}</td>
+                <td>₹${parseFloat(product.price || 0).toFixed(2)}</td>
+                <td>${product.merchant_name || 'N/A'}</td>
+              `;
+              productTableBody.appendChild(row);
+            });
+          } else {
+            productTableBody.innerHTML = '<tr><td colspan="4">No products found.</td></tr>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+          productTableBody.innerHTML = '<tr><td colspan="4">Failed to load products.</td></tr>';
         });
-      })
-      .catch(error => {
-        console.error('Error fetching products:', error);
+    }
+
+    // Optional: Live Search for Products
+    const productSearch = document.getElementById('productSearch');
+    if (productSearch) {
+      productSearch.addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#productTableBody tr');
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(filter) ? '' : 'none';
+        });
       });
-  }
-
-  // Trigger when View Products button is clicked
-  document.getElementById('viewProductsBtn').addEventListener('click', () => {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-    document.getElementById('view-products').style.display = 'block';
-    fetchMerchantProducts();
-  });
-
-  // Optional: Live Search
-  document.getElementById('productSearch').addEventListener('input', function () {
-    const filter = this.value.toLowerCase();
-    document.querySelectorAll('#productTableBody tr').forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(filter) ? '' : 'none';
-    });
-  });
-
-    // Handle Product Search
-    document.getElementById('productSearch').addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const rows = document.querySelectorAll('#productTableBody tr');
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-      });
-    });
+    }
   });
 </script>
 </body>

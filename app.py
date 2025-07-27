@@ -73,44 +73,36 @@ def signup():
         phone = request.form.get('phone')
         age = request.form.get('age')
 
-        # Validate required fields
         if not all([username, email, password, sign_up_as]):
             flash("Username, email, password, and role are required.", "error")
             logger.error("Missing required fields: username, email, password, or sign_up_as")
             return render_template('sign-up.html')
 
-        # Validate email
         if not is_valid_email(email):
             flash("Invalid email format.", "error")
             logger.error(f"Invalid email format: {email}")
             return render_template('sign-up.html')
 
-        # Validate username
         if not is_valid_username(username):
             flash("Username must be at least 3 characters and alphanumeric.", "error")
             logger.error(f"Invalid username: {username}")
             return render_template('sign-up.html')
 
-        # Validate password
         if not is_valid_password(password):
             flash("Password must be at least 8 characters.", "error")
             logger.error("Invalid password: too short")
             return render_template('sign-up.html')
 
-        # Validate sign_up_as
-        valid_roles = ['merchant', 'loan_borrower', 'nbfc_admin']
-        if sign_up_as not in valid_roles:
+        if sign_up_as not in ['merchant', 'loan_borrower', 'nbfc_admin']:
             flash("Invalid role selected.", "error")
             logger.error(f"Invalid role: {sign_up_as}")
             return render_template('sign-up.html')
 
-        # Validate phone (optional)
         if phone and not re.match(r'^\+?\d{10,15}$', phone):
             flash("Invalid phone number format.", "error")
             logger.error(f"Invalid phone number: {phone}")
             return render_template('sign-up.html')
 
-        # Validate age (optional)
         if age:
             try:
                 age = int(age)
@@ -126,27 +118,21 @@ def signup():
             age = None
 
         try:
-            # Check if username exists
             username_check = supabase.table('user_profiles').select('username').eq('username', username).execute()
             if username_check.data:
                 flash("Username already taken.", "error")
                 logger.error(f"Username already taken: {username}")
                 return render_template('sign-up.html')
 
-            # Check if email exists
             email_check = supabase.table('user_profiles').select('email').eq('email', email).execute()
             if email_check.data:
                 flash("Email already registered.", "error")
                 logger.error(f"Email already registered: {email}")
                 return render_template('sign-up.html')
 
-            # Generate user ID
             user_id = str(uuid.uuid4())
-
-            # Hash password
             hashed_password = generate_password_hash(password)
 
-            # Prepare user data
             user_data = {
                 'id': user_id,
                 'username': username,
@@ -158,7 +144,6 @@ def signup():
                 'created_at': datetime.utcnow().isoformat(),
             }
 
-            # Insert into user_profiles table
             response = supabase.table('user_profiles').insert(user_data).execute()
             if response.data:
                 session.permanent = True
@@ -175,10 +160,7 @@ def signup():
 
         except Exception as e:
             logger.error(f"Sign-up error: {str(e)}")
-            if 'infinite recursion detected' in str(e).lower():
-                flash("Sign-up failed due to a database configuration error. Please contact support.", "error")
-            else:
-                flash(f"Sign-up failed: {str(e)}", "error")
+            flash(f"Sign-up failed: {str(e)}", "error")
             return render_template('sign-up.html')
 
     return render_template('sign-up.html')
@@ -198,7 +180,7 @@ def signin():
             flash("Invalid email format.", "error")
             return render_template('sign-in.html')
 
-        if not is_valid_sign_up_as(sign_in_as):
+        if sign_in_as not in ['merchant', 'loan_borrower', 'nbfc_admin']:
             flash("Invalid role selected.", "error")
             return render_template('sign-in.html')
 
@@ -245,7 +227,7 @@ def dashboard():
             flash(f"Error fetching products: {str(e)}", "error")
             return render_template('Merchant.html', username=username, role=role, products=[])
     elif role == 'loan_borrower':
-        return render_template('loan-browser.html', username=username, role=role)
+        return render_template('dashboard.html', username=username, role=role)
     elif role == 'nbfc_admin':
         return render_template('nbfc_admin.html', username=username, role=role)
     else:
@@ -296,7 +278,6 @@ def add_referral_loan():
         return jsonify({'error': 'Please sign in as a merchant to continue.'}), 401
 
     try:
-        # Get form data
         first_name = request.form.get("first_name")
         last_name = request.form.get("last_name")
         dob = request.form.get("dob")
@@ -311,18 +292,15 @@ def add_referral_loan():
         pan_number = request.form.get("panNumber")
         user_id = session.get("user_id")
 
-        # Handle file uploads
         aadhaar_file = request.files.get("aadharFile")
         pan_file = request.files.get("panFile")
 
-        # Validate required fields
         required_fields = [first_name, last_name, dob, age, phone, address, occupation, 
                          monthly_income, loan_amount, loan_purpose, aadhaar_number, pan_number]
         if not all(required_fields) or not aadhaar_file or not pan_file:
             logger.error(f"Missing required fields: {request.form}, files: {aadhaar_file is None}, {pan_file is None}")
             return jsonify({'error': 'All fields are required.'}), 400
 
-        # Validate numeric fields
         try:
             age = int(age)
             monthly_income = float(monthly_income)
@@ -331,7 +309,6 @@ def add_referral_loan():
             logger.error("Invalid numeric field values")
             return jsonify({'error': 'Age, monthly income, and loan amount must be valid numbers.'}), 400
 
-        # Validate schema constraints
         if age < 18:
             logger.error("Age must be at least 18")
             return jsonify({'error': 'Age must be at least 18.'}), 400
@@ -342,7 +319,6 @@ def add_referral_loan():
             logger.error("Loan amount must be greater than 0")
             return jsonify({'error': 'Loan amount must be greater than 0.'}), 400
 
-        # Validate date of birth
         try:
             dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
             if dob_date > datetime.now().date():
@@ -352,7 +328,6 @@ def add_referral_loan():
             logger.error("Invalid date of birth format")
             return jsonify({'error': 'Date of birth must be in YYYY-MM-DD format.'}), 400
 
-        # Validate Aadhar and PAN numbers
         if not is_valid_aadhar_number(aadhaar_number):
             logger.error("Invalid Aadhar number format")
             return jsonify({'error': 'Aadhar number must be a 12-digit number.'}), 400
@@ -360,19 +335,16 @@ def add_referral_loan():
             logger.error("Invalid PAN number format")
             return jsonify({'error': 'PAN number must be in the format ABCDE1234F.'}), 400
 
-        # Check for existing Aadhar number
         existing_aadhaar = supabase.table('loans').select('aadhaar_number').eq('aadhaar_number', aadhaar_number).execute()
         if existing_aadhaar.data:
             logger.error(f"Aadhaar number {aadhaar_number} already exists")
             return jsonify({'error': 'Aadhaar number already exists.'}), 400
 
-        # Check for existing PAN number
         existing_pan = supabase.table('loans').select('pan_number').eq('pan_number', pan_number).execute()
         if existing_pan.data:
             logger.error(f"PAN number {pan_number} already exists")
             return jsonify({'error': 'PAN number already exists.'}), 400
 
-        # Validate file types and sizes
         if not (aadhaar_file.filename.endswith('.pdf') and pan_file.filename.endswith('.pdf')):
             logger.error("Invalid file type: Only PDF files are allowed")
             return jsonify({'error': 'Only PDF files are allowed.'}), 400
@@ -381,15 +353,12 @@ def add_referral_loan():
             logger.error("File size exceeds 5MB")
             return jsonify({'error': 'Files must be less than 5MB.'}), 400
 
-        # Read file content
         aadhaar_file_content = aadhaar_file.read()
         pan_file_content = pan_file.read()
 
-        # Generate unique filenames
         aadhaar_filename = f"aadhar/{uuid.uuid4()}_{secure_filename(aadhaar_file.filename)}"
         pan_filename = f"pan/{uuid.uuid4()}_{secure_filename(pan_file.filename)}"
 
-        # Upload files to Supabase bucket "documents"
         try:
             supabase.storage.from_("documents").upload(
                 aadhaar_filename, aadhaar_file_content, {"content-type": "application/pdf"}
@@ -401,11 +370,9 @@ def add_referral_loan():
             logger.error(f"Error uploading files to Supabase storage: {str(e)}")
             return jsonify({'error': f"Failed to upload files: {str(e)}"}), 500
 
-        # Get public URLs
         aadhaar_file_url = supabase.storage.from_("documents").get_public_url(aadhaar_filename)
         pan_file_url = supabase.storage.from_("documents").get_public_url(pan_filename)
 
-        # Prepare loan data with referred_by set to the merchant's user_id
         loan_data = {
             "user_id": user_id,
             "first_name": first_name,
@@ -428,7 +395,6 @@ def add_referral_loan():
             "referred_by": user_id
         }
 
-        # Insert loan data
         try:
             response = supabase.table("loans").insert(loan_data).execute()
             if response.data:
@@ -490,7 +456,7 @@ def get_user_loans():
         loan_data = []
         for loan in loans:
             loan_data.append({
-                'loan_id': loan['id'],               
+                'loan_id': loan['id'],
                 'amount': loan['loan_amount'],
                 'purpose': loan['loan_purpose'],
                 'status': loan['status'].capitalize()
@@ -561,7 +527,7 @@ def update_product(product_id):
         return jsonify({'error': 'Name and price are required'}), 400
 
     try:
-        product = supabase.table('products').select('*').eq('product_id', product_id).eq('user_id', user_id).execute()
+        product = supabase.table('products').select('*').eq('id', product_id).eq('user_id', user_id).execute()
         logger.info(f"Product query result: {product.data}")
         if not product.data:
             logger.error(f"Product not found or unauthorized: {product_id}")
@@ -574,7 +540,7 @@ def update_product(product_id):
             'price': float(price)
         }
 
-        response = supabase.table('products').update(product_data).eq('product_id', product_id).execute()
+        response = supabase.table('products').update(product_data).eq('id', product_id).execute()
         logger.info(f"Update response: {response.data}")
         if response.data:
             flash("Product updated successfully!", "info")
@@ -607,8 +573,8 @@ def get_all_products():
         products = supabase.table('products').select('name, description, price, user_id').execute().data
         enriched_products = []
         for p in products:
-            merchant = supabase.table('user_profiles').select('username').eq('id', p['user_id']).execute().data
-            merchant_name = merchant[0]['username'] if merchant else 'Unknown'
+            merchant = supabase.table('user_profiles').select('username').eq('id', p['user_id']).execute()
+            merchant_name = merchant.data[0]['username'] if merchant.data else 'Unknown'
             enriched_products.append({
                 'name': p['name'],
                 'description': p.get('description', ''),
@@ -973,4 +939,4 @@ def debug_users():
         return f"Error: {str(e)}"
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=500)
+    app.run(host="0.0.0.0", port=5000)
