@@ -227,7 +227,7 @@ def dashboard():
             flash(f"Error fetching products: {str(e)}", "error")
             return render_template('Merchant.html', username=username, role=role, products=[])
     elif role == 'loan_borrower':
-        return render_template('dashboard.html', username=username, role=role)
+        return render_template('loan-browser.html', username=username, role=role)
     elif role == 'nbfc_admin':
         return render_template('nbfc_admin.html', username=username, role=role)
     else:
