@@ -470,7 +470,7 @@
             row.innerHTML = `
               <td>${loan.id}</td>
               <td>${loan.first_name} ${loan.last_name}</td>
-              <td>$${parseFloat(loan.loan_amount).toFixed(2)}</td>
+              <td>$${parseFloat(loan.loan_amount)}</td>
               <td><span class="badge bg-${loan.status === 'pending' ? 'warning' : loan.status === 'accepted' ? 'success' : 'danger'}">${loan.status.charAt(0).toUpperCase() + loan.status.slice(1)}</span></td>
               <td><a href="${loan.aadhaar_url}" target="_blank">View Aadhaar</a></td>
               <td><a href="${loan.pan_url}" target="_blank">View PAN</a></td>

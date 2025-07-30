@@ -352,10 +352,6 @@ def add_referral_loan():
         if aadhaar_file.content_length > max_size or pan_file.content_length > max_size:
             logger.error("File size exceeds 5MB")
             return jsonify({'error': 'Files must be less than 5MB.'}), 400
-        max_size = 5 * 1024 * 1024
-        if pan_file.content_length > max_size or pan_file.content_length > max_size:
-            logger.error("File size exceeds 5MB")
-            return jsonify({'error': 'Files must be less than 5MB.'}), 400
 
         aadhaar_file_content = aadhaar_file.read()
         pan_file_content = pan_file.read()
@@ -471,18 +467,7 @@ def get_referral_loan_details(id):
             'pan_number': loan_data.get('pan_number', 'N/A'),
             'aadhaar_url': loan_data.get('aadhaar_url', 'N/A'),
             'pan_url': loan_data.get('pan_url', 'N/A'),
-            'status': loan_data['status'].capitalize() if loan_data.get('status') else 'N/A',
-            'appraisal_slip_url': loan_data.get('appraisal_slip_url', 'N/A'),
-            'invoice_url': loan_data.get('invoice_url', 'N/A'),
-            'gold_photo_url': loan_data.get('gold_photo_url', 'N/A'),
-            'aadhaar_front_url': loan_data.get('aadhaar_front_url', 'N/A'),
-            'aadhaar_back_url': loan_data.get('aadhaar_back_url', 'N/A'),
-            'pan_front_url': loan_data.get('pan_front_url', 'N/A'),
-            'pan_back_url': loan_data.get('pan_back_url', 'N/A'),
-            'bank_statement_url': loan_data.get('bank_statement_url', 'N/A'),
-            'income_proof_url': loan_data.get('income_proof_url', 'N/A'),
-            'address_proof_url': loan_data.get('address_proof_url', 'N/A'),
-            'utility_bill_url': loan_data.get('utility_bill_url', 'N/A')
+           
         }
 
         logger.info(f"Fetched referral loan details for ID: {id}")
@@ -490,7 +475,74 @@ def get_referral_loan_details(id):
     except Exception as e:
         logger.error(f"Error fetching referral loan details for ID {id}: {str(e)}")
         return jsonify({'error': str(e)}), 500
+@app.route('/add-loan-documents/<id>', methods=['POST'])
+def add_loan_documents(id):
+    if 'user_id' not in session or session.get('sign_in_as') != 'merchant':
+        logger.error("Unauthorized access to add-loan-documents")
+        return jsonify({'error': 'Unauthorized'}), 401
 
+    try:
+        loan = supabase.table('loans').select('status').eq('id', id).eq('referred_by', session['user_id']).execute()
+        if not loan.data or loan.data[0]['status'].lower() != 'accepted':
+            logger.error(f"Loan {id} not found or not accepted")
+            return jsonify({'error': 'Only accepted loans can add documents'}), 403
+
+        appraisal_slip = request.files.get('appraisalSlip')
+        invoice = request.files.get('invoice')
+        gold_photo = request.files.get('goldPhoto')
+        aadhaar_front = request.files.get('aadhaarFront')
+        aadhaar_back = request.files.get('aadhaarBack')
+        pan_front = request.files.get('panFront')
+        pan_back = request.files.get('panBack')
+        bank_statement = request.files.get('bankStatement')
+        income_proof = request.files.get('incomeProof')
+        address_proof = request.files.get('addressProof')
+        utility_bill = request.files.get('utilityBill')
+
+        files = {
+            'appraisal_slip': appraisal_slip,
+            'invoice': invoice,
+            'gold_photo': gold_photo,
+            'aadhaar_front': aadhaar_front,
+            'aadhaar_back': aadhaar_back,
+            'pan_front': pan_front,
+            'pan_back': pan_back,
+            'bank_statement': bank_statement,
+            'income_proof': income_proof,
+            'address_proof': address_proof,
+            'utility_bill': utility_bill
+        }
+
+        update_data = {}
+        for key, file in files.items():
+            if file and file.filename:
+                if not file.filename.endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+                    logger.error(f"Invalid file type for {key}")
+                    return jsonify({'error': f'Invalid file type for {key}. Use PDF, JPG, JPEG, or PNG.'}), 400
+                if file.content_length > 5 * 1024 * 1024:
+                    logger.error(f"File size exceeds 5MB for {key}")
+                    return jsonify({'error': f'File size for {key} must be less than 5MB.'}), 400
+
+                filename = f"documents/{uuid.uuid4()}_{secure_filename(file.filename)}"
+                supabase.storage.from_("documents").upload(filename, file.read(), {"content-type": file.content_type})
+                url = supabase.storage.from_("documents").get_public_url(filename)
+                update_data[f'{key}_url'] = url
+
+        if update_data:
+            response = supabase.table('loans').update(update_data).eq('id', id).execute()
+            if response.data:
+                logger.info(f"Documents added for loan {id}")
+                return jsonify({'message': 'Documents added successfully'}), 200
+            else:
+                logger.error(f"Failed to update documents for loan {id}")
+                return jsonify({'error': 'Failed to update documents'}), 500
+        else:
+            logger.info(f"No new documents uploaded for loan {id}")
+            return jsonify({'message': 'No documents uploaded'}), 200
+
+    except Exception as e:
+        logger.error(f"Error adding loan documents for ID {id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/get-user-loans', methods=['GET'])

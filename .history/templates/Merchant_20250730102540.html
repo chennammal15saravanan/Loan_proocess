@@ -340,20 +340,21 @@
             <p><strong>Date of Birth:</strong> <span id="detailDob"></span></p>
             <p><strong>Phone:</strong> <span id="detailPhone"></span></p>
             <p><strong>Address:</strong> <span id="detailAddress"></span></p>
-            <p><strong>Aadhaar Number:</strong> <span id="detailAadhaar"></span></p>
-            <p><strong>Aadhaar URL:</strong> <a id="detailAadhaarUrl" href="#" target="_blank">View</a></p>
           </div>
           <div class="col-md-6">
+            <p><strong>Aadhaar Number:</strong> <span id="detailAadhaar"></span></p>
+            <p><strong>PAN Number:</strong> <span id="detailPan"></span></p>
             <p><strong>Occupation:</strong> <span id="detailOccupation"></span></p>
             <p><strong>Age:</strong> <span id="detailAge"></span></p>
             <p><strong>Monthly Income:</strong> <span id="detailMonthlyIncome"></span></p>
             <p><strong>Loan Amount:</strong> <span id="detailLoanAmount"></span></p>
             <p><strong>Loan Purpose:</strong> <span id="detailLoanPurpose"></span></p>
-            <p><strong>PAN Number:</strong> <span id="detailPan"></span></p>
+            <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+            <p><strong>Aadhaar URL:</strong> <a id="detailAadhaarUrl" href="#" target="_blank">View</a></p>
             <p><strong>PAN URL:</strong> <a id="detailPanUrl" href="#" target="_blank">View</a></p>
+            
           </div>
           <div class="col-12 text-end">
-            <p><strong>Status:</strong> <span id="detailStatus"></span></p>
             <button type="button" class="btn btn-secondary" id="loanDetailsCloseBtn" data-bs-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" id="addDocumentsBtn" style="display: none;">Add Documents</button>
           </div>
@@ -362,6 +363,7 @@
     </div>
   </div>
 </div>
+
 <!-- Modal for Adding Loan Documents -->
 <div class="modal fade" id="addDocumentsModal" tabindex="-1" aria-labelledby="addDocumentsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -422,7 +424,7 @@
           </div>
           <div class="col-12">
             <input type="hidden" id="loanIdForDocuments">
-            <button type="submit" class="btn btn-primary-600 radius-8">Submit Documents</button>
+            <button type="submit" class="btn btn-primary-600 radius-8">Upload Documents</button>
           </div>
         </form>
       </div>
@@ -486,10 +488,12 @@
     }
 
     // Fetch and Render Referral Loans
+
     function fetchReferralLoans() {
   fetch('/get-referral-loans')
     .then(response => response.json())
     .then(data => {
+      console.log('Fetched referral loans data:', data); // Debug log
       const referralLoanTableBody = document.getElementById('referralLoanTableBody');
       referralLoanTableBody.innerHTML = '';
       data.loans.forEach(loan => {
@@ -514,6 +518,7 @@
           fetch(`/get-referral-loan-details/${loanId}`)
             .then(response => response.json())
             .then(data => {
+              console.log('Fetched loan details data:', data); // Debug log
               if (data.loan) {
                 const loan = data.loan;
                 document.getElementById('detailFirstName').textContent = loan.first_name || 'N/A';

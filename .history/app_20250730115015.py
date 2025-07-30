@@ -492,7 +492,6 @@ def get_referral_loan_details(id):
         return jsonify({'error': str(e)}), 500
 
 
-
 @app.route('/get-user-loans', methods=['GET'])
 def get_user_loans():
     if 'user_id' not in session or session.get('sign_in_as') != 'loan_borrower':

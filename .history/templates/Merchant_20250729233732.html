@@ -153,7 +153,24 @@
                   </thead>
                   <tbody id="referralLoanTableBody">
                     <!-- Populated dynamically via JavaScript -->
-                  </tbody>
+                  
+                  <tbody id="loan-table-body">
+                    {% for loan in loans %}
+                    <tr>
+                        <td>{{ loan.customer_name }}</td>
+                        <td>${{ "%.2f" | format(loan.amount) }}</td>
+                        <td>{{ loan.status }}</td>
+                        <td>
+                            <a href="/get-referral-loan-details/{{ loan.id }}">View</a>
+                            {% if loan.status.lower() == 'accepted' %}
+                                <button onclick="showUploadForm('{{ loan.id }}')">Add Documents</button>
+                            {% elif loan.status.lower() in ['pending', 'rejected'] %}
+                                <button onclick="closeLoan('{{ loan.id }}')">Close</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
                 </table>
               </div>
             </div>
@@ -340,91 +357,20 @@
             <p><strong>Date of Birth:</strong> <span id="detailDob"></span></p>
             <p><strong>Phone:</strong> <span id="detailPhone"></span></p>
             <p><strong>Address:</strong> <span id="detailAddress"></span></p>
-            <p><strong>Aadhaar Number:</strong> <span id="detailAadhaar"></span></p>
-            <p><strong>Aadhaar URL:</strong> <a id="detailAadhaarUrl" href="#" target="_blank">View</a></p>
           </div>
           <div class="col-md-6">
+            <p><strong>Aadhaar Number:</strong> <span id="detailAadhaar"></span></p>
+            <p><strong>PAN Number:</strong> <span id="detailPan"></span></p>
             <p><strong>Occupation:</strong> <span id="detailOccupation"></span></p>
             <p><strong>Age:</strong> <span id="detailAge"></span></p>
             <p><strong>Monthly Income:</strong> <span id="detailMonthlyIncome"></span></p>
             <p><strong>Loan Amount:</strong> <span id="detailLoanAmount"></span></p>
             <p><strong>Loan Purpose:</strong> <span id="detailLoanPurpose"></span></p>
-            <p><strong>PAN Number:</strong> <span id="detailPan"></span></p>
+            <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+            <p><strong>Aadhaar URL:</strong> <a id="detailAadhaarUrl" href="#" target="_blank">View</a></p>
             <p><strong>PAN URL:</strong> <a id="detailPanUrl" href="#" target="_blank">View</a></p>
           </div>
-          <div class="col-12 text-end">
-            <p><strong>Status:</strong> <span id="detailStatus"></span></p>
-            <button type="button" class="btn btn-secondary" id="loanDetailsCloseBtn" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="addDocumentsBtn" style="display: none;">Add Documents</button>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Modal for Adding Loan Documents -->
-<div class="modal fade" id="addDocumentsModal" tabindex="-1" aria-labelledby="addDocumentsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addDocumentsModalLabel">Add Loan Documents</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="addDocumentsForm" class="row g-3">
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="appraisalSlip">Appraisal Slip:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="appraisalSlip" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="invoice">Invoice:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="invoice" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="goldPhoto">Gold Product Live Photo:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="goldPhoto" accept=".jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="aadhaarFront">Aadhaar Front:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="aadhaarFront" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="aadhaarBack">Aadhaar Back:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="aadhaarBack" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="panFront">PAN Front:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="panFront" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="panBack">PAN Back:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="panBack" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="bankStatement">6-Month Bank Statement:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="bankStatement" accept=".pdf">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="incomeProof">Income Proof:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="incomeProof" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="addressProof">Address Proof:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="addressProof" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold text-neutral-900" for="utilityBill">Telephone Bill/EB Bill/Gas Bill/Tax Receipt:</label>
-              <input type="file" class="form-control border border-neutral-200 radius-8" id="utilityBill" accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-          </div>
-          <div class="col-12">
-            <input type="hidden" id="loanIdForDocuments">
-            <button type="submit" class="btn btn-primary-600 radius-8">Submit Documents</button>
-          </div>
-        </form>
       </div>
     </div>
   </div>
@@ -487,93 +433,67 @@
 
     // Fetch and Render Referral Loans
     function fetchReferralLoans() {
-  fetch('/get-referral-loans')
-    .then(response => response.json())
-    .then(data => {
-      const referralLoanTableBody = document.getElementById('referralLoanTableBody');
-      referralLoanTableBody.innerHTML = '';
-      data.loans.forEach(loan => {
-        const row = document.createElement('tr');
-        row.dataset.id = loan.id;
-        row.innerHTML = `
-          <td>${loan.customer_name}</td>
-          <td>₹${parseFloat(loan.amount).toFixed(2)}</td>
-          <td><span class="badge bg-${
-            loan.status.toLowerCase() === 'pending' ? 'warning' :
-            loan.status.toLowerCase() === 'accepted' ? 'success' : 'danger'
-          }">${loan.status}</span></td>
-          <td><button class="btn btn-info btn-sm viewDetails" data-id="${loan.id}">View Details</button></td>
-        `;
-        referralLoanTableBody.appendChild(row);
-      });
+      fetch('/get-referral-loans')
+        .then(response => response.json())
+        .then(data => {
+          const referralLoanTableBody = document.getElementById('referralLoanTableBody');
+          referralLoanTableBody.innerHTML = '';
+          data.loans.forEach(loan => {
+            const row = document.createElement('tr');
+            row.dataset.id = loan.id;
+            row.innerHTML = `
+              <td>${loan.customer_name}</td>
+              <td>₹${parseFloat(loan.amount).toFixed(2)}</td>
+              <td><span class="badge bg-${
+                loan.status.toLowerCase() === 'pending' ? 'warning' :
+                loan.status.toLowerCase() === 'accepted' ? 'success' : 'danger'
+              }">${loan.status}</span></td>
+              <td><button class="btn btn-info btn-sm viewDetails" data-id="${loan.id}">View Details</button></td>
+            `;
+            referralLoanTableBody.appendChild(row);
+          });
 
-      // Add event listeners for View Details buttons
-      document.querySelectorAll('.viewDetails').forEach(button => {
-        button.addEventListener('click', () => {
-          const loanId = button.dataset.id;
-          fetch(`/get-referral-loan-details/${loanId}`)
-            .then(response => response.json())
-            .then(data => {
-              if (data.loan) {
-                const loan = data.loan;
-                document.getElementById('detailFirstName').textContent = loan.first_name || 'N/A';
-                document.getElementById('detailLastName').textContent = loan.last_name || 'N/A';
-                document.getElementById('detailDob').textContent = loan.dob || 'N/A';
-                document.getElementById('detailPhone').textContent = loan.phone || 'N/A';
-                document.getElementById('detailAddress').textContent = loan.address || 'N/A';
-                document.getElementById('detailAadhaar').textContent = loan.aadhaar_number || 'N/A';
-                document.getElementById('detailPan').textContent = loan.pan_number || 'N/A';
-                document.getElementById('detailOccupation').textContent = loan.occupation || 'N/A';
-                document.getElementById('detailAge').textContent = loan.age || 'N/A';
-                document.getElementById('detailMonthlyIncome').textContent = `₹${loan.monthly_income.toFixed(2) || '0.00'}`;
-                document.getElementById('detailLoanAmount').textContent = `₹${loan.loan_amount.toFixed(2) || '0.00'}`;
-                document.getElementById('detailLoanPurpose').textContent = loan.loan_purpose || 'N/A';
-                document.getElementById('detailStatus').textContent = loan.status || 'N/A';
-
-                // Only set Aadhaar and PAN URL links
-                const setUrlLink = (elementId, url) => {
-                  const linkElement = document.getElementById(elementId);
-                  if (url && url !== 'N/A') {
-                    linkElement.href = url;
-                    linkElement.style.display = 'inline';
+          // Add event listeners for View Details buttons
+          document.querySelectorAll('.viewDetails').forEach(button => {
+            button.addEventListener('click', () => {
+              const loanId = button.dataset.id;
+              fetch(`/get-referral-loan-details/${loanId}`)
+                .then(response => response.json())
+                .then(data => {
+                  if (data.loan) {
+                    const loan = data.loan;
+                    document.getElementById('detailFirstName').textContent = loan.first_name;
+                    document.getElementById('detailLastName').textContent = loan.last_name;
+                    document.getElementById('detailDob').textContent = loan.dob;
+                    document.getElementById('detailPhone').textContent = loan.phone;
+                    document.getElementById('detailAddress').textContent = loan.address;
+                    document.getElementById('detailAadhaar').textContent = loan.aadhaar_number;
+                    document.getElementById('detailPan').textContent = loan.pan_number;
+                    document.getElementById('detailOccupation').textContent = loan.occupation;
+                    document.getElementById('detailAge').textContent = loan.age;
+                    document.getElementById('detailMonthlyIncome').textContent = `₹${loan.monthly_income.toFixed(2)}`;
+                    document.getElementById('detailLoanAmount').textContent = `₹${loan.loan_amount.toFixed(2)}`;
+                    document.getElementById('detailLoanPurpose').textContent = loan.loan_purpose;
+                    document.getElementById('detailStatus').textContent = loan.status;
+                    document.getElementById('detailAadhaarUrl').href = loan.aadhaar_url;
+                    document.getElementById('detailPanUrl').href = loan.pan_url;
+                    new bootstrap.Modal(document.getElementById('loanDetailsModal')).show();
                   } else {
-                    linkElement.href = '#';
-                    linkElement.style.display = 'none';
+                    alert('Error fetching loan details.');
                   }
-                };
-
-                setUrlLink('detailAadhaarUrl', loan.aadhaar_url);
-                setUrlLink('detailPanUrl', loan.pan_url);
-
-                const status = loan.status.toLowerCase();
-                const addDocumentsBtn = document.getElementById('addDocumentsBtn');
-                const closeBtn = document.getElementById('loanDetailsCloseBtn');
-                if (status === 'accepted') {
-                  addDocumentsBtn.style.display = 'inline-block';
-                  closeBtn.style.display = 'none';
-                  addDocumentsBtn.dataset.loanId = loanId;
-                } else {
-                  addDocumentsBtn.style.display = 'none';
-                  closeBtn.style.display = 'inline-block';
-                }
-
-                new bootstrap.Modal(document.getElementById('loanDetailsModal')).show();
-              } else {
-                alert('Error fetching loan details.');
-              }
-            })
-            .catch(error => {
-              console.error('Error fetching loan details:', error);
-              alert('Error fetching loan details.');
+                })
+                .catch(error => {
+                  console.error('Error fetching loan details:', error);
+                  alert('Error fetching loan details.');
+                });
             });
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching referral loans:', error);
+          alert('Error fetching referral loans.');
         });
-      });
-    })
-    .catch(error => {
-      console.error('Error fetching referral loans:', error);
-      alert('Error fetching referral loans.');
-    });
-}
+    }
 
     document.querySelectorAll('#statusDropdown .dropdown-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -823,62 +743,8 @@
     document.querySelector('a[href="#product-desc"]').addEventListener('click', () => {
       fetchProducts();
     });
-
-    // Add Documents Modal
-    const addDocumentsModal = new bootstrap.Modal(document.getElementById('addDocumentsModal'));
-    document.getElementById('addDocumentsBtn').addEventListener('click', () => {
-      const loanId = document.getElementById('addDocumentsBtn').dataset.loanId;
-      document.getElementById('loanIdForDocuments').value = loanId;
-      document.getElementById('addDocumentsForm').reset();
-      addDocumentsModal.show();
-    });
-
-    document.getElementById('addDocumentsForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const loanId = document.getElementById('loanIdForDocuments').value;
-      const formData = new FormData();
-      formData.append('loanId', loanId);
-
-      const files = {
-        appraisalSlip: document.getElementById('appraisalSlip').files[0],
-        invoice: document.getElementById('invoice').files[0],
-        goldPhoto: document.getElementById('goldPhoto').files[0],
-        aadhaarFront: document.getElementById('aadhaarFront').files[0],
-        aadhaarBack: document.getElementById('aadhaarBack').files[0],
-        panFront: document.getElementById('panFront').files[0],
-        panBack: document.getElementById('panBack').files[0],
-        bankStatement: document.getElementById('bankStatement').files[0],
-        incomeProof: document.getElementById('incomeProof').files[0],
-        addressProof: document.getElementById('addressProof').files[0],
-        utilityBill: document.getElementById('utilityBill').files[0]
-      };
-
-      for (let key in files) {
-        if (files[key]) {
-          formData.append(key, files[key]);
-        }
-      }
-
-      fetch(`/add-loan-documents/${loanId}`, {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          alert(data.message);
-          addDocumentsModal.hide();
-          fetchReferralLoans(); // Refresh the loan list to reflect new documents
-        }
-      })
-      .catch(error => {
-        console.error('Error adding loan documents:', error);
-        alert('Error adding loan documents.');
-      });
-    });
   });
+
 </script>
 </body>
 </html>
