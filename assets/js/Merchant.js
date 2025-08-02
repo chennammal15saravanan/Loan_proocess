@@ -168,17 +168,28 @@
       });
     });
 
-    document.querySelectorAll('#referralStatusDropdown .dropdown-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const status = item.getAttribute('data-status');
-        const rows = document.querySelectorAll('#referralLoanTableBody tr');
-        rows.forEach(row => {
-          const rowStatus = row.querySelector('td:nth-child(3) span').textContent.toLowerCase();
-          row.style.display = status === 'all' || rowStatus === status ? '' : 'none';
-        });
-        document.getElementById('referralStatusDropdown').textContent = status.charAt(0).toUpperCase() + status.slice(1);
-      });
+    // Handle status dropdown filter for Referral Loans table
+document.querySelectorAll('#referralStatusDropdown + .dropdown-menu .dropdown-item').forEach(item => {
+  item.addEventListener('click', function (e) {
+    e.preventDefault();
+    const selectedStatus = this.getAttribute('data-status');
+    const dropdownButton = document.getElementById('referralStatusDropdown');
+    dropdownButton.textContent = this.textContent; // Update button text to selected status
+
+    // Get all rows in the referral loan table
+    const rows = document.querySelectorAll('#referralLoanTableBody tr');
+
+    // Filter rows based on selected status
+    rows.forEach(row => {
+      const statusCell = row.querySelector('td:nth-child(3)'); // Status is in the third column
+      if (selectedStatus === 'all' || statusCell.textContent.toLowerCase() === selectedStatus) {
+        row.style.display = ''; // Show row
+      } else {
+        row.style.display = 'none'; // Hide row
+      }
     });
+  });
+});
 
     // Add Referral Loan
     const referralLoanModal = new bootstrap.Modal(document.getElementById('referralLoanModal'));

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,33 @@
   <link rel="stylesheet" href="assets/css/lib/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/lib/magnific-popup.css">
   <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .dropdown-menu {
+      background-color: #2d3748;
+      color: #e2e8f0;
+      border: 1px solid #4a5568;
+    }
+    .dropdown-menu .dropdown-item {
+      color: #e2e8f0;
+    }
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #4a5568;
+      color: #ffffff;
+    }
+    .table {
+      background-color: #ffffff;
+      color: #2d3748;
+    }
+    .btn-secondary {
+      background-color: #4a5568;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    .btn-secondary:hover {
+      background-color: #718096;
+      border-color: #718096;
+    }
+  </style>
 </head>
 <body>
 <aside class="sidebar">
@@ -30,9 +57,6 @@
           <span>Merchant Dashboard</span>
         </a>
         <ul class="sidebar-submenu">
-          <li>
-            <a href="#view-request-loan"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> View Request Loan</a>
-          </li>
           <li>
             <a href="#referral-loans"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i> Referral Loans</a>
           </li>
@@ -121,21 +145,21 @@
     <div id="referral-loans" class="section" style="display: none;">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 class="fw-semibold mb-0">Referral Loans</h6>
-        <div class="d-flex gap-2">
-          <input type="text" class="form-control" id="referralLoanSearch" placeholder="Search...">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="referralStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Status
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="referralStatusDropdown">
-              <li><a class="dropdown-item" href="#" data-status="all">All</a></li>
-              <li><a class="dropdown-item" href="#" data-status="pending">Pending</a></li>
-              <li><a class="dropdown-item" href="#" data-status="accepted">Accepted</a></li>
-              <li><a class="dropdown-item" href="#" data-status="rejected">Rejected</a></li>
-            </ul>
-          </div>
-          <button type="button" class="btn btn-primary-600 radius-8" id="addReferralLoanBtn">Apply Loan</button>
+      </div>
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-24">
+        <input type="text" class="form-control flex-grow-1" id="referralLoanSearch" placeholder="Search..." style="max-width: 300px;">
+        <div class="dropdown">
+          <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="referralStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Status
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="referralStatusDropdown">
+            <li><a class="dropdown-item" href="#" data-status="all">All</a></li>
+            <li><a class="dropdown-item" href="#" data-status="pending">Pending</a></li>
+            <li><a class="dropdown-item" href="#" data-status="accepted">Accepted</a></li>
+            <li><a class="dropdown-item" href="#" data-status="rejected">Rejected</a></li>
+          </ul>
         </div>
+        <button type="button" class="btn btn-sm btn-success radius-8" id="addReferralLoanBtn" style="width: 150px;">Apply Loan</button>
       </div>
       <div class="row gy-4">
         <div class="col-lg-12">
@@ -188,7 +212,6 @@
                         <td>{{ product.name }}</td>
                         <td>{{ product.description | default('N/A') }}</td>
                         <td>₹${Number(product.price).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-
                         <td>
                           <button class="btn btn-warning btn-sm editProduct" data-id="{{ product.product_id }}">Edit</button>
                         </td>
@@ -209,7 +232,6 @@
       <div class="col-auto">
         <p class="mb-0">© 2025 SAMRAT Motor Finance. All Rights Reserved.</p>
       </div>
-      
     </div>
   </footer>
 </main>
@@ -244,8 +266,6 @@
   </div>
 </div>
 
-
-<!-- Modal for Add Referral Loan -->
 <!-- Modal for Add Referral Loan -->
 <div class="modal fade" id="referralLoanModal" tabindex="-1" aria-labelledby="referralLoanModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -279,9 +299,9 @@
             </div>
             <div class="mb-3">
               <label class="form-label fw-bold text-neutral-900" for="customerAadhaarNumber">Aadhaar Number:</label>
-              <input type="text" class="form-control border border-neutral-200 radius-8" id="customerAadhaarNumber" placeholder="1234-5678-9012" 
-                     pattern="\d{4}-\d{4}-\d{4}" maxlength="12" title="Enter a valid Aadhaar number (e.g., 1234-5678-9012)" 
-                     required style="background-color: transparent;" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
+              <input type="text" class="form-control border border-neutral-200 radius-8" id="customerAadhaarNumber" placeholder="123456789012" 
+                     pattern="\d{12}" maxlength="12" title="Enter a valid 12-digit Aadhaar number (e.g., 123456789012)" 
+                     required style="background-color: transparent;" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 12);">
             </div>
           </div>
           <div class="col-md-6">
@@ -328,46 +348,15 @@
               <label class="form-label fw-bold text-neutral-900" for="panFile">PAN Document:</label>
               <input type="file" class="form-control border border-neutral-200 radius-8" id="panFile" accept=".pdf,image/*" required style="background-color: transparent;">
             </div>
-          </div>
-          <div class="col-12 text-end">
-            <button type="submit" class="btn btn-primary-600 radius-8">Submit Loan</button>
+            <div class="col-12 text-end">
+              <button type="submit" class="btn btn-primary-600 radius-8">Submit Loan</button>
+            </div>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  function restrictPanInput(input) {
-    let value = input.value.toUpperCase();
-    if (value.length > 10) {
-      value = value.slice(0, 10); // Limit to 10 characters
-    }
-
-    // Apply restrictions based on current length
-    if (value.length <= 5) {
-      value = value.replace(/[^A-Z]/g, ''); // Only alphabets for first 5
-    } else if (value.length <= 9) {
-      value = value.replace(/[^A-Z0-9]/g, ''); // Alphabets and numbers for next 4
-      value = value.slice(0, 5) + value.slice(5).replace(/[^0-9]/g, ''); // Ensure only numbers after 5th
-    } else if (value.length === 10) {
-      value = value.slice(0, 9) + value.slice(9).replace(/[^A-Z]/g, ''); // Only alphabet for last
-    }
-
-    input.value = value;
-  }
-
-  // Validation on form submission
-  document.getElementById('referralLoanForm').addEventListener('submit', function(event) {
-    const pan = document.getElementById('customerPanNumber').value;
-    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
-      alert('Please enter a valid PAN number (5 alphabets, 4 numbers, 1 alphabet, e.g., ABCDE1234F).');
-      event.preventDefault();
-      return;
-    }
-  });
-</script>
 
 <!-- Modal for Viewing Referral Loan Details -->
 <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-labelledby="loanDetailsModalLabel" aria-hidden="true">
@@ -407,6 +396,7 @@
     </div>
   </div>
 </div>
+
 <!-- Modal for Adding Loan Documents -->
 <div class="modal fade" id="addDocumentsModal" tabindex="-1" aria-labelledby="addDocumentsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -464,10 +454,10 @@
               <label class="form-label fw-bold text-neutral-900" for="utilityBill">Telephone Bill/EB Bill/Gas Bill/Tax Receipt:</label>
               <input type="file" class="form-control border border-neutral-200 radius-8" id="utilityBill" accept=".pdf,.jpg,.jpeg,.png">
             </div>
-          </div>
-          <div class="col-12">
-            <input type="hidden" id="loanIdForDocuments">
-            <button type="submit" class="btn btn-primary-600 radius-8">Submit Documents</button>
+            <div class="col-12">
+              <input type="hidden" id="loanIdForDocuments">
+              <button type="submit" class="btn btn-primary-600 radius-8">Submit Documents</button>
+            </div>
           </div>
         </form>
       </div>
@@ -475,13 +465,48 @@
   </div>
 </div>
 
+<script>
+  function restrictPanInput(input) {
+    let value = input.value.toUpperCase();
+    if (value.length > 10) {
+      value = value.slice(0, 10); // Limit to 10 characters
+    }
+
+    // Apply restrictions based on current length
+    if (value.length <= 5) {
+      value = value.replace(/[^A-Z]/g, ''); // Only alphabets for first 5
+    } else if (value.length <= 9) {
+      value = value.replace(/[^A-Z0-9]/g, ''); // Alphabets and numbers for next 4
+      value = value.slice(0, 5) + value.slice(5).replace(/[^0-9]/g, ''); // Ensure only numbers after 5th
+    } else if (value.length === 10) {
+      value = value.slice(0, 9) + value.slice(9).replace(/[^A-Z]/g, ''); // Only alphabet for last
+    }
+
+    input.value = value;
+  }
+
+  // Validation on form submission
+  document.getElementById('referralLoanForm').addEventListener('submit', function(event) {
+    const pan = document.getElementById('customerPanNumber').value;
+    const aadhaar = document.getElementById('customerAadhaarNumber').value;
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
+      alert('Please enter a valid PAN number (5 alphabets, 4 numbers, 1 alphabet, e.g., ABCDE1234F).');
+      event.preventDefault();
+      return;
+    }
+    if (!/^\d{12}$/.test(aadhaar)) {
+      alert('Please enter a valid 12-digit Aadhaar number (e.g., 123456789012).');
+      event.preventDefault();
+      return;
+    }
+  });
+</script>
+
 <script src="assets/js/lib/jquery-3.7.1.min.js"></script>
 <script src="assets/js/lib/bootstrap.bundle.min.js"></script>
 <script src="assets/js/lib/iconify-icon.min.js"></script>
 <script src="assets/js/lib/magnifc-popup.min.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/Merchant.js"></script>
-
-
 </body>
 </html>
